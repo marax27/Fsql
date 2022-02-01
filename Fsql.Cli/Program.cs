@@ -12,7 +12,7 @@ while (true)
     if (input is null || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
         break;
 
-    var query = new Query(input);
+    var query = new Query(new List<string>(), input);
     var qe = new QueryEvaluation(access);
 
     var result = qe.Evaluate(query);

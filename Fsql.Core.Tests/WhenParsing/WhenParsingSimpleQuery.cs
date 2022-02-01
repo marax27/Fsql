@@ -22,9 +22,9 @@ public class WhenParsingSimpleQuery : IClassFixture<ParserFixture>
     }
 
     [Theory]
-    [InlineData("sample-path")]
-    [InlineData("very/deep/path")]
-    [InlineData("x1.y2-01.PATH")]
+    [InlineData("sample_path")]
+    [InlineData("/very/deep/path")]
+    [InlineData("c:/x1.y2-01.PATH")]
     [InlineData("./path")]
     public void GivenSimplePathThenReturnExpectedPath(string givenPath)
     {

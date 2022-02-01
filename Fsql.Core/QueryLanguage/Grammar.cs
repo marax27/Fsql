@@ -11,11 +11,12 @@ namespace Fsql.Core.QueryLanguage
         Separator,
         SingleQuoteString,
         DoubleQuoteString,
-        SimpleString,
+        PathString,
+        Identifier,
         Wildcard,
 
         // Non-terminal symbols.
-        QUERY, STRING
+        QUERY, TERM, TERMS, STRING
     }
 
     internal class Grammar
@@ -29,7 +30,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Separator] = ",",
                 [Alphabet.SingleQuoteString] = "'[^']*'",
                 [Alphabet.DoubleQuoteString] = "\"[^\"]*\"",
-                [Alphabet.SimpleString] = @"[a-zA-Z_\\/\.]\S*",
+                [Alphabet.PathString] = @"(\.|[a-zA-Z]:|/|\\)\S*",
+                [Alphabet.Identifier] = "[a-zA-Z_]\\w*",
                 [Alphabet.Wildcard] = "\\*"
             });
 
@@ -38,14 +40,15 @@ namespace Fsql.Core.QueryLanguage
             {
                 [Alphabet.QUERY] = new []
                 {
-                    new Token[]{ Alphabet.Select, Alphabet.Wildcard, Alphabet.From, Alphabet.STRING, new Op(o =>
+                    new Token[]{ Alphabet.Select, Alphabet.TERMS, Alphabet.From, Alphabet.STRING, new Op(o =>
                     {
-                        o[0] = new Query(new List<string>{ o[1] }, o[3]);
+                        o[0] = new Query(o[1], o[3]);
                     }) }
                 },
                 [Alphabet.STRING] = new []
                 {
-                    new Token[]{ Alphabet.SimpleString },
+                    new Token[]{ Alphabet.Identifier },
+                    new Token[]{ Alphabet.PathString },
                     new Token[]{ Alphabet.SingleQuoteString, new Op(o =>
                     {
                         var value = (o[0] as string)?[1..^1];
@@ -57,6 +60,24 @@ namespace Fsql.Core.QueryLanguage
                         o[0] = value ?? throw new ParserException($"Failed to process {nameof(Alphabet.DoubleQuoteString)}: null string.");
                     }) }
                 },
+                [Alphabet.TERMS] = new []
+                {
+                    new Token[]{ Alphabet.TERM, new Op(o =>
+                    {
+                        o[0] = new List<string>{ o[0] };
+                    }) },
+                    new Token[]{ Alphabet.TERM, Alphabet.Separator, Alphabet.TERMS, new Op(o =>
+                    {
+                        var terms = new List<string>{ o[0] };
+                        terms.AddRange(o[2]);
+                        o[0] = terms;
+                    }) }
+                },
+                [Alphabet.TERM] = new []
+                {
+                    new Token[]{ Alphabet.Identifier },
+                    new Token[]{ Alphabet.Wildcard },
+                }
             });
     }
 }

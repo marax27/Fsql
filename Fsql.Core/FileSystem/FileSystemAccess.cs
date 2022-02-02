@@ -5,7 +5,17 @@
         File, Directory
     }
 
-    public record FileSystemEntry(string FullPath, FileSystemEntryType Type);
+    public record FileSystemEntry
+    {
+        public string FullPath { get; }
+        public FileSystemEntryType Type { get; }
+
+        public FileSystemEntry(string fullPath, FileSystemEntryType type)
+        {
+            FullPath = fullPath.TrimEnd('/', '\\');
+            Type = type;
+        }
+    }
 
     public interface IFileSystemAccess
     {

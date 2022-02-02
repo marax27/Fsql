@@ -9,4 +9,9 @@
     {
         public override string ToText() => Value;
     }
+
+    public sealed record NullValueType : BaseValueType
+    {
+        public override string ToText() => "null";
+    }
 }

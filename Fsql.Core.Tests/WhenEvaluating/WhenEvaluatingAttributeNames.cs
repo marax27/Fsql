@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem;
 using Xunit;
 
@@ -39,7 +40,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
         [InlineData("Name")]
         [InlineData("NAME")]
         [InlineData("extension")]
-        [InlineData("absolute_path")]
+        [InlineData("type")]
         public void Given1NamedAttributeReturn1ValuePerRow(string givenAttribute)
         {
             var result = Evaluate(new[] { givenAttribute });

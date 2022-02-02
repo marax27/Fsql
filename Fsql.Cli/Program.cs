@@ -1,9 +1,11 @@
 ﻿using Fsql.Core;
 using Fsql.Core.FileSystem;
+using Fsql.Core.QueryLanguage;
 
 Console.WriteLine("Greetings.");
 
 var access = new FileSystemAccess();
+var parser = new QueryParser();
 
 while (true)
 {
@@ -12,7 +14,7 @@ while (true)
     if (input is null || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
         break;
 
-    var query = new Query(new List<string>(), input);
+    var query = parser.Parse(input);
     var qe = new QueryEvaluation(access);
 
     var result = qe.Evaluate(query);

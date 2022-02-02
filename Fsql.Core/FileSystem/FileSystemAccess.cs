@@ -5,26 +5,40 @@
         File, Directory
     }
 
-    public record FileSystemEntry
+    public abstract record BaseFileSystemEntry
     {
         public string FullPath { get; }
         public FileSystemEntryType Type { get; }
+        
+        public abstract double Size { get; }
 
-        public FileSystemEntry(string fullPath, FileSystemEntryType type)
+        protected BaseFileSystemEntry(string fullPath, FileSystemEntryType type)
         {
             FullPath = fullPath.TrimEnd('/', '\\');
             Type = type;
         }
     }
 
+    public record FileSystemEntry : BaseFileSystemEntry
+    {
+        public override double Size => Details.Length;
+
+        public FileSystemEntry(string fullPath, FileSystemEntryType type)
+            : base(fullPath, type) {}
+
+        private FileInfo? _details;
+
+        private FileInfo Details => _details ??= new FileInfo(FullPath);
+    }
+
     public interface IFileSystemAccess
     {
-        IEnumerable<FileSystemEntry> GetEntries(string directoryPath);
+        IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath);
     }
 
     public class FileSystemAccess : IFileSystemAccess
     {
-        public IEnumerable<FileSystemEntry> GetEntries(string directoryPath)
+        public IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath)
         {
             var files = Directory.EnumerateFiles(directoryPath)
                 .Select(path => new FileSystemEntry(path, FileSystemEntryType.File));

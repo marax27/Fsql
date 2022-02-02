@@ -65,14 +65,22 @@ namespace Fsql.Core.Tests.WhenEvaluating
         }
     }
 
+    internal record FakeFileSystemEntry : BaseFileSystemEntry
+    {
+        public override double Size => 123456;
+
+        public FakeFileSystemEntry(string fullPath, FileSystemEntryType type)
+            : base(fullPath, type) {}
+    }
+
     internal class FakeFileSystemAccess : IFileSystemAccess
     {
-        private readonly IDictionary<string, List<FileSystemEntry>> _entries = new Dictionary<string, List<FileSystemEntry>>();
+        private readonly IDictionary<string, List<BaseFileSystemEntry>> _entries = new Dictionary<string, List<BaseFileSystemEntry>>();
 
         public FakeFileSystemAccess WithFiles(string rootPath, params string[] fileNames)
         {
             var newEntries = fileNames
-                .Select(filename => new FileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File));
             AppendEntries(rootPath, newEntries);
             return this;
         }
@@ -80,17 +88,17 @@ namespace Fsql.Core.Tests.WhenEvaluating
         public FakeFileSystemAccess WithDirectories(string rootPath, params string[] directoryNames)
         {
             var newEntries = directoryNames
-                .Select(filename => new FileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory));
             AppendEntries(rootPath, newEntries);
             return this;
         }
 
-        public IEnumerable<FileSystemEntry> GetEntries(string directoryPath)
+        public IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath)
         {
             return _entries[directoryPath];
         }
 
-        private void AppendEntries(string directoryPath, IEnumerable<FileSystemEntry> entries)
+        private void AppendEntries(string directoryPath, IEnumerable<BaseFileSystemEntry> entries)
         {
             if (_entries.ContainsKey(directoryPath))
                 _entries[directoryPath].AddRange(entries);

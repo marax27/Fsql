@@ -28,7 +28,7 @@ public class QueryEvaluation
         return new(headers, rows);
     }
 
-    private static BaseValueType[] CreateRow(FileSystemEntry entry, IReadOnlyCollection<string> attributes, IQueryContext<FileSystemEntry> queryContext)
+    private static BaseValueType[] CreateRow(BaseFileSystemEntry entry, IReadOnlyCollection<string> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
     {
         var result = attributes
             .Select(attribute => queryContext.Get(attribute, entry))
@@ -36,7 +36,7 @@ public class QueryEvaluation
         return result;
     }
 
-    private static IReadOnlyCollection<string> ExpandAttributes(IEnumerable<string> attributes, IQueryContext<FileSystemEntry> queryContext)
+    private static IReadOnlyCollection<string> ExpandAttributes(IEnumerable<string> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
     {
         var result = new List<string>();
         foreach (var attribute in attributes)

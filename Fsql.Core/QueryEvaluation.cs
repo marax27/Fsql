@@ -2,6 +2,46 @@
 
 namespace Fsql.Core
 {
+    public interface IQueryContext<in TEntry>
+    {
+        public IReadOnlyCollection<string> Attributes { get; }
+        
+        public BaseValueType Get(string attribute, TEntry entry);
+    }
+
+    public class FileSystemQueryContext : IQueryContext<FileSystemEntry>
+    {
+        private const string NameAttribute = "name";
+        private const string ExtensionAttribute = "extension";
+        private const string TypeAttribute = "type";
+
+        public IReadOnlyCollection<string> Attributes => new[]
+        {
+            NameAttribute, ExtensionAttribute, TypeAttribute
+        };
+
+        public BaseValueType Get(string attribute, FileSystemEntry entry)
+        {
+            return attribute.ToLower() switch
+            {
+                NameAttribute => new StringValueType(Path.GetFileName(entry.FullPath)),
+                ExtensionAttribute => GetExtension(entry),
+                TypeAttribute => new StringValueType(entry.Type.ToString()),
+                _ => throw new ApplicationException($"Unknown attribute: {attribute}.")
+            };
+        }
+
+        private static BaseValueType GetExtension(FileSystemEntry entry)
+        {
+            return entry.Type switch
+            {
+                FileSystemEntryType.File => new StringValueType(Path.GetExtension(entry.FullPath)),
+                FileSystemEntryType.Directory => new NullValueType(),
+                _ => throw new ApplicationException($"Unsupported filesystem entry type: {entry.Type}.")
+            };
+        }
+    }
+
     public record QueryEvaluationResult(
         IReadOnlyCollection<string> AttributeNames,
         IReadOnlyCollection<BaseValueType[]> Rows);
@@ -17,69 +57,32 @@ namespace Fsql.Core
 
         public QueryEvaluationResult Evaluate(Query query)
         {
-            var entries = _fileSystemAccess.GetEntries(query.FromPath);
-
-            var expandedAttributes = ExpandAttributes(query.SelectedAttributes);
-
-            var headers = CreateHeaders(expandedAttributes);
-            var rows = entries
-                .Select(e => CreateRow(e, expandedAttributes).ToArray())
+            var queryContext = new FileSystemQueryContext();
+            var expandedAttributes = ExpandAttributes(query.SelectedAttributes, queryContext);
+            var headers = expandedAttributes;
+            
+            var rows = _fileSystemAccess.GetEntries(query.FromPath)
+                .Select(e => CreateRow(e, expandedAttributes, queryContext))
                 .ToList();
 
             return new(headers, rows);
         }
 
-        private static List<BaseValueType> CreateRow(FileSystemEntry entry, IReadOnlyCollection<string> attributes)
+        private static BaseValueType[] CreateRow(FileSystemEntry entry, IReadOnlyCollection<string> attributes, IQueryContext<FileSystemEntry> queryContext)
         {
-            var result = new List<BaseValueType>();
-            foreach (var attribute in attributes)
-            {
-                ProcessAttribute(entry, attribute, result);
-            }
+            var result = attributes
+                .Select(attribute => queryContext.Get(attribute, entry))
+                .ToArray();
             return result;
         }
 
-        private static void ProcessAttribute(FileSystemEntry entry, string attributeName, List<BaseValueType> row)
+        private static IReadOnlyCollection<string> ExpandAttributes(IEnumerable<string> attributes, IQueryContext<FileSystemEntry> queryContext)
         {
-            var comparison = StringComparison.OrdinalIgnoreCase;
-
-            if (attributeName.Equals("name", comparison))
-                row.Add(ReadNameAttribute(entry));
-            else if (attributeName.Equals("extension", comparison))
-                row.Add(ReadExtensionAttribute(entry));
-            else if (attributeName.Equals("type", comparison))
-                row.Add(ReadTypeAttribute(entry));
-            else
-                row.Add(new NullValueType());
-        }
-
-        private static StringValueType ReadNameAttribute(FileSystemEntry entry)
-            => new (Path.GetFileName(entry.FullPath));
-
-        private static BaseValueType ReadExtensionAttribute(FileSystemEntry entry)
-            => entry.Type switch
-            {
-                FileSystemEntryType.File => new StringValueType(Path.GetExtension(entry.FullPath)),
-                FileSystemEntryType.Directory => new NullValueType(),
-                _ => throw new ApplicationException($"Unsupported filesystem entry type: {entry.Type}.")
-            };
-
-        private static StringValueType ReadTypeAttribute(FileSystemEntry entry)
-            => new (entry.Type.ToString());
-
-        private static IReadOnlyCollection<string> CreateHeaders(IReadOnlyCollection<string> attributes)
-        {
-            return attributes;
-        }
-
-        private static IReadOnlyCollection<string> ExpandAttributes(IReadOnlyCollection<string> attributes)
-        {
-            var baseAttributes = new[] { "name", "extension", "type" };
             var result = new List<string>();
             foreach (var attribute in attributes)
             {
                 if (attribute.Equals("*"))
-                    result.AddRange(baseAttributes);
+                    result.AddRange(queryContext.Attributes);
                 else
                     result.Add(attribute);
             }

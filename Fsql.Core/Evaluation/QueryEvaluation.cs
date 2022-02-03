@@ -71,6 +71,6 @@ internal class EntryOrdering
 
         var orderByAttribute = _orderByExpression.Attributes.First();
         return entries
-            .OrderBy(entry => _context.Get(orderByAttribute, entry).ToText());
+            .OrderBy(entry => _context.Get(orderByAttribute, entry));
     }
 }

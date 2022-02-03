@@ -8,10 +8,16 @@ public class FileSystemQueryContext : IQueryContext<BaseFileSystemEntry>
     private const string ExtensionAttribute = "extension";
     private const string TypeAttribute = "type";
     private const string SizeAttribute = "size";
+    private const string AccessTimeAttribute = "access_time";
+    private const string CreateTimeAttribute = "create_time";
+    private const string ModifyTimeAttribute = "modify_time";
+    private const string AbsolutePathAttribute = "absolute_path";
 
     public IReadOnlyCollection<string> Attributes => new[]
     {
-        NameAttribute, ExtensionAttribute, TypeAttribute, SizeAttribute
+        NameAttribute, ExtensionAttribute, TypeAttribute, SizeAttribute,
+        AccessTimeAttribute, CreateTimeAttribute, ModifyTimeAttribute,
+        AbsolutePathAttribute
     };
 
     public BaseValueType Get(string attribute, BaseFileSystemEntry entry)
@@ -22,6 +28,10 @@ public class FileSystemQueryContext : IQueryContext<BaseFileSystemEntry>
             ExtensionAttribute => GetExtension(entry),
             TypeAttribute => new StringValueType(entry.Type.ToString()),
             SizeAttribute => GetSize(entry),
+            AbsolutePathAttribute => new StringValueType(entry.AbsolutePath),
+            AccessTimeAttribute => new DateTimeValueType(entry.AccessTime),
+            CreateTimeAttribute => new DateTimeValueType(entry.CreateTime),
+            ModifyTimeAttribute => new DateTimeValueType(entry.ModifyTime),
             _ => throw new ApplicationException($"Unknown attribute: {attribute}.")
         };
     }

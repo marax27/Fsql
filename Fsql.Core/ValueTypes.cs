@@ -21,4 +21,9 @@ namespace Fsql.Core
     {
         public override string ToText() => Value.ToString(CultureInfo.CurrentCulture);
     }
+
+    public sealed record DateTimeValueType(DateTime DateTime) : BaseValueType
+    {
+        public override string ToText() => DateTime.ToString("yyyy-MM-dd HH:mm:ss");
+    }
 }

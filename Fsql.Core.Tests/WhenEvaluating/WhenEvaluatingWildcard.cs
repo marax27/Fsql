@@ -16,7 +16,8 @@ public class WhenEvaluatingWildcard
 
         var result = sut.Evaluate(query);
 
-        result.AttributeNames.Should().BeEquivalentTo(new[] { "name", "extension", "type", "size" },
+        result.AttributeNames.Should().BeEquivalentTo(
+            new[] { "name", "extension", "type", "size", "access_time", "create_time", "modify_time", "absolute_path" },
             o => o.WithStrictOrdering());
     }
 }

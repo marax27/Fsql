@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
@@ -68,6 +69,10 @@ namespace Fsql.Core.Tests.WhenEvaluating
     internal record FakeFileSystemEntry : BaseFileSystemEntry
     {
         public override double Size => 123456;
+        public override string AbsolutePath => $"/absolute/path/{FullPath}";
+        public override DateTime AccessTime => DateTime.MinValue;
+        public override DateTime CreateTime => DateTime.MinValue;
+        public override DateTime ModifyTime => DateTime.MinValue;
 
         public FakeFileSystemEntry(string fullPath, FileSystemEntryType type)
             : base(fullPath, type) {}

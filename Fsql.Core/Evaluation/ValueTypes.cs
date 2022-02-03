@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Fsql.Core
+namespace Fsql.Core.Evaluation
 {
     public abstract record BaseValueType
     {

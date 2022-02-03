@@ -60,7 +60,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
 
         private QueryEvaluationResult Evaluate(string givenPath, IFileSystemAccess fileSystemAccess)
         {
-            var givenQuery = new Query(new List<string>(), givenPath);
+            var givenQuery = new Query(new List<string>(), givenPath, OrderByExpression.NoOrdering);
             var sut = new QueryEvaluation(fileSystemAccess);
             return sut.Evaluate(givenQuery);
         }

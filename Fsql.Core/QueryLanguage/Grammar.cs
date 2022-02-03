@@ -8,6 +8,8 @@ namespace Fsql.Core.QueryLanguage
         IgnoreToken,
         Select,
         From,
+        Order,
+        By,
         Separator,
         SingleQuoteString,
         DoubleQuoteString,
@@ -16,7 +18,8 @@ namespace Fsql.Core.QueryLanguage
         Wildcard,
 
         // Non-terminal symbols.
-        QUERY, TERM, TERMS, STRING
+        QUERY, TERM, TERMS, STRING, EXPRESSION,
+        SELECT_EXPRESSION, FROM_EXPRESSION, ORDER_BY_EXPRESSION,
     }
 
     internal class Grammar
@@ -27,6 +30,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.IgnoreToken] = "[ \\n]+",
                 [Alphabet.Select] = "[sS][eE][lL][eE][cC][tT]",
                 [Alphabet.From] = "[fF][rR][oO][mM]",
+                [Alphabet.Order] = "[oO][rR][dD][eE][rR]",
+                [Alphabet.By] = "[bB][yY]",
                 [Alphabet.Separator] = ",",
                 [Alphabet.SingleQuoteString] = "'[^']*'",
                 [Alphabet.DoubleQuoteString] = "\"[^\"]*\"",
@@ -40,10 +45,29 @@ namespace Fsql.Core.QueryLanguage
             {
                 [Alphabet.QUERY] = new []
                 {
-                    new Token[]{ Alphabet.Select, Alphabet.TERMS, Alphabet.From, Alphabet.STRING, new Op(o =>
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, new Op(o =>
                     {
-                        o[0] = new Query(o[1], o[3]);
-                    }) }
+                        o[0] = new Query(o[0], o[1], OrderByExpression.NoOrdering);
+                    }) },
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.ORDER_BY_EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new Query(o[0], o[1], o[2]);
+                    }) },
+                },
+                [Alphabet.SELECT_EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.Select, Alphabet.TERMS, new Op(o => { o[0] = o[1]; }) },
+                },
+                [Alphabet.FROM_EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.From, Alphabet.STRING, new Op(o => { o[0] = o[1]; }) },
+                },
+                [Alphabet.ORDER_BY_EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.Order, Alphabet.By, Alphabet.Identifier, new Op(o =>
+                    {
+                        o[0] = new OrderByExpression(new List<string>{ o[2] });
+                    }) },
                 },
                 [Alphabet.STRING] = new []
                 {

@@ -12,6 +12,8 @@ namespace Fsql.Core.QueryLanguage
         Where,
         Order,
         By,
+        And,
+        Or,
         Ascending,
         Descending,
         Separator,
@@ -33,7 +35,7 @@ namespace Fsql.Core.QueryLanguage
 
         // Non-terminal symbols.
         QUERY, TERM, TERMS, STRING,
-        EXPRESSION, A1, A4,
+        EXPRESSION, A1, A4, A6, A7,
         SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, ORDER_BY_EXPRESSION,
         ORDER_CONDITION,
     }
@@ -49,6 +51,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Where] = "[wW][hH][eE][rR][eE]",
                 [Alphabet.Order] = "[oO][rR][dD][eE][rR]",
                 [Alphabet.By] = "[bB][yY]",
+                [Alphabet.And] = "[aA][nN][dD]",
+                [Alphabet.Or] = "[oO][rR]",
                 [Alphabet.Ascending] = "[aA][sS][cC]",
                 [Alphabet.Descending] = "[dD][eE][sS][cC]",
                 [Alphabet.Separator] = ",",
@@ -130,7 +134,23 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.EXPRESSION] = new []
                 {
-                    new Token[]{ Alphabet.A4 }
+                    new Token[]{ Alphabet.A7 }
+                },
+                [Alphabet.A7] = new[]
+                {
+                    new Token[] { Alphabet.A7, Alphabet.Or, Alphabet.A6, new Op(o =>
+                    {
+                        o[0] = new OrExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A6 },
+                },
+                [Alphabet.A6] = new []
+                {
+                    new Token[] { Alphabet.A6, Alphabet.And, Alphabet.A4, new Op(o =>
+                    {
+                        o[0] = new AndExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4 },
                 },
                 [Alphabet.A4] = new []
                 {
@@ -162,7 +182,7 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.A1] = new []
                 {
-                    new Token[] { Alphabet.LeftParenthesis, Alphabet.A4, Alphabet.RightParenthesis },
+                    new Token[] { Alphabet.LeftParenthesis, Alphabet.A7, Alphabet.RightParenthesis },
                     new Token[] { Alphabet.Identifier, new Op(o => { o[0] = new IdentifierReferenceExpression(new(o[0])); }) },
                     new Token[] { Alphabet.Number, new Op(o => { o[0] = new ConstantExpression(new NumberValueType(double.Parse(o[0]))); }) },
                     new Token[] { Alphabet.STRING, new Op(o => { o[0] = new ConstantExpression(new StringValueType(o[0])); }) },

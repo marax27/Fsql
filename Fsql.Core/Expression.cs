@@ -75,3 +75,26 @@ public record LessThanOrEqualExpression(Expression Left, Expression Right) : Exp
         return new BooleanValueType(result <= 0);
     }
 }
+
+public record AndExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        // Hopefully, this will sometimes improve performance by skipping the right expression.
+        if (!Left.Evaluate(context).EvaluatesToTrue())
+            return new BooleanValueType(false);
+
+        return new BooleanValueType(Right.Evaluate(context).EvaluatesToTrue());
+    }
+}
+
+public record OrExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        if (Left.Evaluate(context).EvaluatesToTrue())
+            return new BooleanValueType(true);
+
+        return new BooleanValueType(Right.Evaluate(context).EvaluatesToTrue());
+    }
+}

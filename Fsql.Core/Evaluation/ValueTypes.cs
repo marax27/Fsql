@@ -25,7 +25,7 @@ namespace Fsql.Core.Evaluation
         public override int CompareTo(BaseValueType? other) =>
             other switch
             {
-                StringValueType stringOther => string.Compare(Value, stringOther.Value, StringComparison.OrdinalIgnoreCase),
+                StringValueType stringOther => string.Compare(Value, stringOther.Value, StringComparison.Ordinal),
                 _ => TryNullOrThrow(other, nameof(StringValueType))
             };
 

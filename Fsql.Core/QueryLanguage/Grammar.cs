@@ -8,6 +8,7 @@ namespace Fsql.Core.QueryLanguage
         IgnoreToken,
         Select,
         From,
+        Where,
         Order,
         By,
         Ascending,
@@ -19,9 +20,11 @@ namespace Fsql.Core.QueryLanguage
         Identifier,
         Wildcard,
 
+        EqualsOperator,
+
         // Non-terminal symbols.
         QUERY, TERM, TERMS, STRING, EXPRESSION,
-        SELECT_EXPRESSION, FROM_EXPRESSION, ORDER_BY_EXPRESSION,
+        SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, ORDER_BY_EXPRESSION,
         ORDER_CONDITION,
     }
 
@@ -33,6 +36,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.IgnoreToken] = "[ \\n\\t]+",
                 [Alphabet.Select] = "[sS][eE][lL][eE][cC][tT]",
                 [Alphabet.From] = "[fF][rR][oO][mM]",
+                [Alphabet.Where] = "[wW][hH][eE][rR][eE]",
                 [Alphabet.Order] = "[oO][rR][dD][eE][rR]",
                 [Alphabet.By] = "[bB][yY]",
                 [Alphabet.Ascending] = "[aA][sS][cC]",
@@ -42,7 +46,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.DoubleQuoteString] = "\"[^\"]*\"",
                 [Alphabet.PathString] = @"(\.|[a-zA-Z]:|/|\\)\S*",
                 [Alphabet.Identifier] = "[a-zA-Z_]\\w*",
-                [Alphabet.Wildcard] = "\\*"
+                [Alphabet.Wildcard] = "\\*",
+                [Alphabet.EqualsOperator] = "=",
             });
 
         public GrammarRules<Alphabet> Rules = new(
@@ -67,6 +72,10 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[]{ Alphabet.From, Alphabet.STRING, new Op(o => { o[0] = o[1]; }) },
                 },
+                [Alphabet.WHERE_EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.Where, Alphabet.EXPRESSION },
+                },
                 [Alphabet.ORDER_BY_EXPRESSION] = new []
                 {
                     new Token[]{ Alphabet.Order, Alphabet.By, Alphabet.ORDER_CONDITION, new Op(o =>
@@ -87,6 +96,17 @@ namespace Fsql.Core.QueryLanguage
                     new Token[]{ Alphabet.Identifier, Alphabet.Descending, new Op(o =>
                     {
                         o[0] = new OrderCondition(new Identifier(o[0]), false);
+                    }) },
+                },
+                [Alphabet.EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.Identifier, new Op(o =>
+                    {
+                        o[0] = new IdentifierReferenceExpression(new Identifier(o[0]));
+                    }) },
+                    new Token[]{ Alphabet.EXPRESSION, Alphabet.EqualsOperator, Alphabet.EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new EqualsExpression(o[0], o[2]);
                     }) },
                 },
                 [Alphabet.STRING] = new []

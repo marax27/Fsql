@@ -59,6 +59,20 @@ namespace Fsql.Core.Evaluation
             };
     }
 
+    public sealed record BooleanValueType(bool Value) : BaseValueType
+    {
+        public override string ToText() => Value ? "T" : "F";
+
+        public override int CompareTo(BaseValueType? other) =>
+            other switch
+            {
+                BooleanValueType booleanValue => Value == booleanValue.Value
+                    ? booleanValue.Value ? 0 : 1
+                    : booleanValue.Value ? -1 : 0,
+                _ => TryNullOrThrow(other, nameof(BooleanValueType))
+            };
+    }
+
     public class CastException : ApplicationException
     {
         public CastException(string message) : base(message) {}

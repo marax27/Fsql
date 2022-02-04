@@ -15,6 +15,7 @@ namespace Fsql.Core.QueryLanguage
         Ascending,
         Descending,
         Separator,
+        Number,
         SingleQuoteString,
         DoubleQuoteString,
         PathString,
@@ -46,6 +47,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Ascending] = "[aA][sS][cC]",
                 [Alphabet.Descending] = "[dD][eE][sS][cC]",
                 [Alphabet.Separator] = ",",
+                [Alphabet.Number] = "[+-]?([0-9]*[.])?[0-9]+",
                 [Alphabet.SingleQuoteString] = "'[^']*'",
                 [Alphabet.DoubleQuoteString] = "\"[^\"]*\"",
                 [Alphabet.PathString] = @"(\.|[a-zA-Z]:|/|\\)\S*",
@@ -132,6 +134,7 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[] { Alphabet.LeftParenthesis, Alphabet.A4, Alphabet.RightParenthesis },
                     new Token[] { Alphabet.Identifier, new Op(o => { o[0] = new IdentifierReferenceExpression(new(o[0])); }) },
+                    new Token[] { Alphabet.Number, new Op(o => { o[0] = new ConstantExpression(new NumberValueType(double.Parse(o[0]))); }) },
                     new Token[] { Alphabet.STRING, new Op(o => { o[0] = new ConstantExpression(new StringValueType(o[0])); }) },
                 },
                 [Alphabet.STRING] = new []

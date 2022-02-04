@@ -19,7 +19,7 @@ public class QueryEvaluation
     {
         var queryContext = new FileSystemQueryContext();
         var expandedAttributes = ExpandAttributes(query.SelectedAttributes, queryContext);
-        var headers = expandedAttributes;
+        var headers = expandedAttributes.Select(attribute => attribute.Name).ToList();
         var ordering = new EntryOrdering(query.OrderByExpression, queryContext);
 
         var allRows = _fileSystemAccess.GetEntries(query.FromPath);
@@ -31,7 +31,7 @@ public class QueryEvaluation
         return new(headers, rows);
     }
 
-    private static BaseValueType[] CreateRow(BaseFileSystemEntry entry, IReadOnlyCollection<string> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
+    private static BaseValueType[] CreateRow(BaseFileSystemEntry entry, IReadOnlyCollection<Identifier> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
     {
         var result = attributes
             .Select(attribute => queryContext.Get(attribute, entry))
@@ -39,12 +39,12 @@ public class QueryEvaluation
         return result;
     }
 
-    private static IReadOnlyCollection<string> ExpandAttributes(IEnumerable<string> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
+    private static IReadOnlyCollection<Identifier> ExpandAttributes(IEnumerable<Identifier> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
     {
-        var result = new List<string>();
+        var result = new List<Identifier>();
         foreach (var attribute in attributes)
         {
-            if (attribute.Equals("*"))
+            if (attribute.Name.Equals("*"))
                 result.AddRange(queryContext.Attributes);
             else
                 result.Add(attribute);

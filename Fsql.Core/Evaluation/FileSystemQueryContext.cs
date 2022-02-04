@@ -13,16 +13,16 @@ public class FileSystemQueryContext : IQueryContext<BaseFileSystemEntry>
     private const string ModifyTimeAttribute = "modify_time";
     private const string AbsolutePathAttribute = "absolute_path";
 
-    public IReadOnlyCollection<string> Attributes => new[]
+    public IReadOnlyCollection<Identifier> Attributes => new[]
     {
         NameAttribute, ExtensionAttribute, TypeAttribute, SizeAttribute,
         AccessTimeAttribute, CreateTimeAttribute, ModifyTimeAttribute,
         AbsolutePathAttribute
-    };
+    }.Select(name => new Identifier(name)).ToList();
 
-    public BaseValueType Get(string attribute, BaseFileSystemEntry entry)
+    public BaseValueType Get(Identifier attribute, BaseFileSystemEntry entry)
     {
-        return attribute.ToLower() switch
+        return attribute.Name.ToLower() switch
         {
             NameAttribute => new StringValueType(Path.GetFileName(entry.FullPath)),
             ExtensionAttribute => GetExtension(entry),

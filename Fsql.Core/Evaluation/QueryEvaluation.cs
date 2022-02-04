@@ -20,8 +20,11 @@ public class QueryEvaluation
         var queryContext = new FileSystemQueryContext();
         var expandedAttributes = ExpandAttributes(query.SelectedAttributes, queryContext);
         var headers = expandedAttributes;
-            
-        var rows = _fileSystemAccess.GetEntries(query.FromPath)
+        var ordering = new EntryOrdering(query.OrderByExpression, queryContext);
+
+        var allRows = _fileSystemAccess.GetEntries(query.FromPath);
+        var orderedRows = ordering.OrderBy(allRows);
+        var rows = orderedRows
             .Select(e => CreateRow(e, expandedAttributes, queryContext))
             .ToList();
 
@@ -47,5 +50,31 @@ public class QueryEvaluation
                 result.Add(attribute);
         }
         return result;
+    }
+}
+
+internal class EntryOrdering
+{
+    private readonly OrderByExpression _orderByExpression;
+    private readonly IQueryContext<BaseFileSystemEntry> _context;
+
+    public EntryOrdering(OrderByExpression orderByExpression, IQueryContext<BaseFileSystemEntry> context)
+    {
+        _orderByExpression = orderByExpression ?? throw new ArgumentNullException(nameof(orderByExpression));
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    public IEnumerable<BaseFileSystemEntry> OrderBy(IEnumerable<BaseFileSystemEntry> entries)
+    {
+        if (_orderByExpression == OrderByExpression.NoOrdering)
+            return entries;
+
+        BaseValueType Predicate(BaseFileSystemEntry entry, OrderCondition condition) =>
+            _context.Get(condition.Attribute, entry);
+
+        var condition = _orderByExpression.Conditions.First();
+        return condition.Ascending
+            ? entries.OrderBy(e => Predicate(e, condition))
+            : entries.OrderByDescending(e => Predicate(e, condition));
     }
 }

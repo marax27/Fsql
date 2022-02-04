@@ -60,7 +60,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
 
         private QueryEvaluationResult Evaluate(string givenPath, IFileSystemAccess fileSystemAccess)
         {
-            var givenQuery = new Query(new List<string>(), givenPath);
+            var givenQuery = new Query(new List<string>(), givenPath, OrderByExpression.NoOrdering);
             var sut = new QueryEvaluation(fileSystemAccess);
             return sut.Evaluate(givenQuery);
         }
@@ -68,14 +68,17 @@ namespace Fsql.Core.Tests.WhenEvaluating
 
     internal record FakeFileSystemEntry : BaseFileSystemEntry
     {
-        public override double Size => 123456;
+        public override double Size { get; }
         public override string AbsolutePath => $"/absolute/path/{FullPath}";
         public override DateTime AccessTime => DateTime.MinValue;
         public override DateTime CreateTime => DateTime.MinValue;
         public override DateTime ModifyTime => DateTime.MinValue;
 
-        public FakeFileSystemEntry(string fullPath, FileSystemEntryType type)
-            : base(fullPath, type) {}
+        public FakeFileSystemEntry(string fullPath, FileSystemEntryType type, double size)
+            : base(fullPath, type)
+        {
+            Size = size;
+        }
     }
 
     internal class FakeFileSystemAccess : IFileSystemAccess
@@ -85,7 +88,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
         public FakeFileSystemAccess WithFiles(string rootPath, params string[] fileNames)
         {
             var newEntries = fileNames
-                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File, 1234));
             AppendEntries(rootPath, newEntries);
             return this;
         }
@@ -93,7 +96,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
         public FakeFileSystemAccess WithDirectories(string rootPath, params string[] directoryNames)
         {
             var newEntries = directoryNames
-                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory, 0));
             AppendEntries(rootPath, newEntries);
             return this;
         }

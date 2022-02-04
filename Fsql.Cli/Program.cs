@@ -1,4 +1,6 @@
-﻿using Fsql.Core.Evaluation;
+﻿using System.Diagnostics;
+using Fsql.Cli;
+using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem;
 using Fsql.Core.QueryLanguage;
 
@@ -15,44 +17,46 @@ while (true)
         break;
 
 #if (DEBUG)
-    var query = parser.Parse(input);
-    var qe = new QueryEvaluation(access);
-
-    var result = qe.Evaluate(query);
+    var result = HandleQuery(input);
     DisplayQueryResults(result);
 #elif (RELEASE)
     try
     {
-        var query = parser.Parse(input);
-        var qe = new QueryEvaluation(access);
-
-        var result = qe.Evaluate(query);
+        var result = HandleQuery(input);
         DisplayQueryResults(result);
     }
     catch (ParserException exc)
     {
-        PrintColor($"Parser exception: {exc.Message}", ConsoleColor.Yellow);
+        ConsoleUtilities.PrintColor($"Parser exception: {exc.Message}", ConsoleColor.Yellow);
         foreach (var error in exc.Errors ?? new List<string>())
-            PrintColor("    - " + error, ConsoleColor.Yellow);
+            ConsoleUtilities.PrintColor("    - " + error, ConsoleColor.Yellow);
     }
     catch (ApplicationException exc)
     {
-        PrintColor($"Application exception: {exc.Message}", ConsoleColor.Yellow);
-        PrintColor(exc.StackTrace ?? "", ConsoleColor.Yellow);
+        ConsoleUtilities.PrintColor($"Application exception: {exc.Message}", ConsoleColor.Yellow);
+        ConsoleUtilities.PrintColor(exc.StackTrace ?? "", ConsoleColor.Yellow);
     }
     catch (Exception exc)
     {
-        PrintColor($"Unhandled exception: {exc.Message}", ConsoleColor.Red);
+        ConsoleUtilities.PrintColor($"Unhandled exception: {exc.Message}", ConsoleColor.Red);
         Console.WriteLine(exc.StackTrace);
     }
 #endif
 }
 
-void PrintColor(string message, ConsoleColor color)
+QueryEvaluationResult HandleQuery(string input)
 {
-    Console.ForegroundColor = color;
-    Console.WriteLine(message);
-    Console.ResetColor();
+    var sw = new Stopwatch();
+    sw.Start();
+
+    var query = parser.Parse(input);
+    var qe = new QueryEvaluation(access);
+    var result = qe.Evaluate(query);
+
+    sw.Stop();
+
+    Console.WriteLine($"{result.Rows.Count} row(s) in {sw.ElapsedMilliseconds}ms.");
+    return result;
 }
 
 void DisplayQueryResults(QueryEvaluationResult evaluationResult)

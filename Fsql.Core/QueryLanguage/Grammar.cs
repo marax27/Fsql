@@ -1,4 +1,4 @@
-using CSharpParserGenerator;
+﻿using CSharpParserGenerator;
 
 namespace Fsql.Core.QueryLanguage
 {
@@ -30,7 +30,7 @@ namespace Fsql.Core.QueryLanguage
         public LexerDefinition<Alphabet> Tokens = new(
             new Dictionary<Alphabet, TokenRegex>
             {
-                [Alphabet.IgnoreToken] = "[ \\n]+",
+                [Alphabet.IgnoreToken] = "[ \\n\\t]+",
                 [Alphabet.Select] = "[sS][eE][lL][eE][cC][tT]",
                 [Alphabet.From] = "[fF][rR][oO][mM]",
                 [Alphabet.Order] = "[oO][rR][dD][eE][rR]",

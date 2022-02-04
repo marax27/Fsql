@@ -22,13 +22,25 @@ public class QueryEvaluation
         var headers = expandedAttributes.Select(attribute => attribute.Name).ToList();
         var ordering = new EntryOrdering(query.OrderByExpression, queryContext);
 
-        var allRows = _fileSystemAccess.GetEntries(query.FromPath);
+        var allRows = GetFiltered(query, queryContext);
         var orderedRows = ordering.OrderBy(allRows);
         var rows = orderedRows
             .Select(e => CreateRow(e, expandedAttributes, queryContext))
             .ToList();
 
         return new(headers, rows);
+    }
+
+    private IEnumerable<BaseFileSystemEntry> GetFiltered(Query query, IQueryContext<BaseFileSystemEntry> context)
+    {
+        var allEntries = _fileSystemAccess.GetEntries(query.FromPath);
+        if (query.WhereExpression is null)
+            return allEntries;
+        else
+        {
+            var filtering = new EntryFiltering(query.WhereExpression, context);
+            return filtering.Filter(allEntries);
+        }
     }
 
     private static BaseValueType[] CreateRow(BaseFileSystemEntry entry, IReadOnlyCollection<Identifier> attributes, IQueryContext<BaseFileSystemEntry> queryContext)
@@ -76,5 +88,46 @@ internal class EntryOrdering
         return condition.Ascending
             ? entries.OrderBy(e => Predicate(e, condition))
             : entries.OrderByDescending(e => Predicate(e, condition));
+    }
+}
+
+internal class EntryFiltering
+{
+    private readonly Expression _filterExpression;
+    private readonly IQueryContext<BaseFileSystemEntry> _context;
+
+    public EntryFiltering(Expression filterExpression, IQueryContext<BaseFileSystemEntry> context)
+    {
+        _filterExpression = filterExpression ?? throw new ArgumentNullException(nameof(filterExpression));
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    public IEnumerable<BaseFileSystemEntry> Filter(IEnumerable<BaseFileSystemEntry> entries)
+    {
+        return entries.Where(EvaluatesToTrue);
+    }
+
+    private bool EvaluatesToTrue(BaseFileSystemEntry entry)
+    {
+        var expressionContext = new ExpressionContext(_context, entry);
+        var result = _filterExpression.Evaluate(expressionContext);
+        return result.EvaluatesToTrue();
+    }
+}
+
+internal class ExpressionContext : IExpressionContext
+{
+    private readonly IQueryContext<BaseFileSystemEntry> _queryContext;
+    private readonly BaseFileSystemEntry _entry;
+
+    public ExpressionContext(IQueryContext<BaseFileSystemEntry> queryContext, BaseFileSystemEntry entry)
+    {
+        _queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
+        _entry = entry ?? throw new ArgumentNullException(nameof(entry));
+    }
+
+    public BaseValueType Get(Identifier identifier)
+    {
+        return _queryContext.Get(identifier, _entry);
     }
 }

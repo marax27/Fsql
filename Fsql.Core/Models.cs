@@ -3,6 +3,7 @@
 public record Query(
     IReadOnlyCollection<Identifier> SelectedAttributes,
     string FromPath,
+    Expression? WhereExpression,
     OrderByExpression OrderByExpression
 );
 

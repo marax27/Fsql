@@ -30,3 +30,12 @@ public record EqualsExpression(Expression Left, Expression Right) : Expression
         return new BooleanValueType(result);
     }
 }
+
+public record NotEqualExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
+        return new BooleanValueType(!result);
+    }
+}

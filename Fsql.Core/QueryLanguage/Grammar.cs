@@ -23,6 +23,7 @@ namespace Fsql.Core.QueryLanguage
         Wildcard,
 
         EqualsOperator,
+        NotEqualOperator,
         LeftParenthesis,
         RightParenthesis,
 
@@ -54,6 +55,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Identifier] = "[a-zA-Z_]\\w*",
                 [Alphabet.Wildcard] = "\\*",
                 [Alphabet.EqualsOperator] = "=",
+                [Alphabet.NotEqualOperator] = "(<>|!=)",
                 [Alphabet.LeftParenthesis] = "\\(",
                 [Alphabet.RightParenthesis] = "\\)",
             });
@@ -127,6 +129,10 @@ namespace Fsql.Core.QueryLanguage
                     new Token[] { Alphabet.A4, Alphabet.EqualsOperator, Alphabet.A1, new Op(o =>
                     {
                         o[0] = new EqualsExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4, Alphabet.NotEqualOperator, Alphabet.A1, new Op(o =>
+                    {
+                        o[0] = new NotEqualExpression(o[0], o[2]);
                     }) },
                     new Token[] { Alphabet.A1 },
                 },

@@ -3,7 +3,7 @@ using FluentAssertions;
 using Fsql.Core.Evaluation;
 using Xunit;
 
-namespace Fsql.Core.Tests.WhenEvaluatingExpressions;
+namespace Fsql.Core.Tests.WhenEvaluatingExpressions.WhenEvaluatingLogicOperators;
 
 public class WhenEvaluatingAttributeConstantEquality
 {

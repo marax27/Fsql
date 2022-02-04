@@ -3,7 +3,7 @@ using FluentAssertions;
 using Fsql.Core.Evaluation;
 using Xunit;
 
-namespace Fsql.Core.Tests.WhenEvaluatingExpressions;
+namespace Fsql.Core.Tests.WhenEvaluatingExpressions.WhenEvaluatingLogicOperators;
 
 public class WhenEvaluatingConstantEquality
 {
@@ -27,11 +27,12 @@ public class WhenEvaluatingConstantEquality
             .Should().Be(new BooleanValueType(false));
     }
 
-    [Fact]
-    public void GivenDifferentNumbersReturnFalse()
+    [Theory]
+    [InlineData(3.14159, 3.14158)]
+    public void GivenDifferentNumbersReturnFalse(double givenFirstValue, double givenOtherValue)
     {
-        var givenFirst = new NumberValueType(3.14159);
-        var givenOther = new NumberValueType(3.14158);
+        var givenFirst = new NumberValueType(givenFirstValue);
+        var givenOther = new NumberValueType(givenOtherValue);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));

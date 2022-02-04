@@ -1,4 +1,4 @@
-﻿using CSharpParserGenerator;
+using CSharpParserGenerator;
 
 namespace Fsql.Core.QueryLanguage
 {
@@ -76,9 +76,18 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.ORDER_CONDITION] = new []
                 {
-                    new Token[]{ Alphabet.Identifier, new Op(o => { o[0] = new OrderCondition(o[0], true); }) },
-                    new Token[]{ Alphabet.Identifier, Alphabet.Ascending, new Op(o => { o[0] = new OrderCondition(o[0], true); }) },
-                    new Token[]{ Alphabet.Identifier, Alphabet.Descending, new Op(o => { o[0] = new OrderCondition(o[0], false); }) },
+                    new Token[]{ Alphabet.Identifier, new Op(o =>
+                    {
+                        o[0] = new OrderCondition(new Identifier(o[0]), true);
+                    }) },
+                    new Token[]{ Alphabet.Identifier, Alphabet.Ascending, new Op(o =>
+                    {
+                        o[0] = new OrderCondition(new Identifier(o[0]), true);
+                    }) },
+                    new Token[]{ Alphabet.Identifier, Alphabet.Descending, new Op(o =>
+                    {
+                        o[0] = new OrderCondition(new Identifier(o[0]), false);
+                    }) },
                 },
                 [Alphabet.STRING] = new []
                 {
@@ -99,11 +108,11 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[]{ Alphabet.TERM, new Op(o =>
                     {
-                        o[0] = new List<string>{ o[0] };
+                        o[0] = new List<Identifier>{ new Identifier(o[0]) };
                     }) },
                     new Token[]{ Alphabet.TERM, Alphabet.Separator, Alphabet.TERMS, new Op(o =>
                     {
-                        var terms = new List<string>{ o[0] };
+                        var terms = new List<Identifier>{ new Identifier(o[0]) };
                         terms.AddRange(o[2]);
                         o[0] = terms;
                     }) }

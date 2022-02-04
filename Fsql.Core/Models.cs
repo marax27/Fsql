@@ -1,14 +1,14 @@
 ﻿namespace Fsql.Core;
 
 public record Query(
-    IReadOnlyCollection<string> SelectedAttributes,
+    IReadOnlyCollection<Identifier> SelectedAttributes,
     string FromPath,
     OrderByExpression OrderByExpression
 );
 
 public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Conditions)
 {
-    public static OrderByExpression NoOrdering => new (new List<OrderCondition>());
+    public static OrderByExpression NoOrdering => new (Array.Empty<OrderCondition>());
 
     public bool Equals(OrderByExpression? other) =>
         other is { } && Conditions.SequenceEqual(other.Conditions);
@@ -16,4 +16,6 @@ public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Condi
     public override int GetHashCode() => Conditions.GetHashCode();
 }
 
-public sealed record OrderCondition(string Attribute, bool Ascending);
+public sealed record OrderCondition(Identifier Attribute, bool Ascending);
+
+public sealed record Identifier(string Name);

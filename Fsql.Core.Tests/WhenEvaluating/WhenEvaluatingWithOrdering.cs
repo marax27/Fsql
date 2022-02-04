@@ -13,7 +13,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "aaa", "ADirectory", "azz", "BDirectory", "ZDirectory" };
-        var givenQuery = new Query(new[] { "name" }, "./path", new(new[] { new OrderCondition("name", true) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", new(new[] { new OrderCondition(new("name"), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -27,7 +27,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ZDirectory", "BDirectory", "azz", "ADirectory", "aaa" };
-        var givenQuery = new Query(new[] { "name" }, "./path", new(new[] { new OrderCondition("name", false) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", new(new[] { new OrderCondition(new("name"), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -41,7 +41,11 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedBySizeAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
-        var givenQuery = new Query(new[] { "name", "size" }, "./path", new(new[] { new OrderCondition("size", true) }));
+        var givenQuery = new Query(
+            new[] { new Identifier("name"), new("size") },
+            "./path",
+            new(new[] { new OrderCondition(new("size"), true) })
+        );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -55,7 +59,11 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedBySizeDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
-        var givenQuery = new Query(new[] { "name", "size" }, "./path", new(new[] { new OrderCondition("size", false) }));
+        var givenQuery = new Query(
+            new[] { new Identifier("name"), new("size") },
+            "./path",
+            new(new[] { new OrderCondition(new("size"), false) })
+        );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);

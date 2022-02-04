@@ -30,3 +30,48 @@ public record EqualsExpression(Expression Left, Expression Right) : Expression
         return new BooleanValueType(result);
     }
 }
+
+public record NotEqualExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
+        return new BooleanValueType(!result);
+    }
+}
+
+public record GreaterThanExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
+        return new BooleanValueType(result > 0);
+    }
+}
+
+public record LessThanExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
+        return new BooleanValueType(result < 0);
+    }
+}
+
+public record GreaterThanOrEqualExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
+        return new BooleanValueType(result >= 0);
+    }
+}
+
+public record LessThanOrEqualExpression(Expression Left, Expression Right) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
+        return new BooleanValueType(result <= 0);
+    }
+}

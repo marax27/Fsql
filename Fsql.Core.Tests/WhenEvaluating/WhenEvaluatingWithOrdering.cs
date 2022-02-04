@@ -12,7 +12,7 @@ public class WhenEvaluatingWithOrdering
     [Fact]
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
-        var expectedNames = new[] { "aaa", "ADirectory", "azz", "BDirectory", "ZDirectory" };
+        var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
         var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
@@ -26,7 +26,7 @@ public class WhenEvaluatingWithOrdering
     [Fact]
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
-        var expectedNames = new[] { "ZDirectory", "BDirectory", "azz", "ADirectory", "aaa" };
+        var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
         var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 

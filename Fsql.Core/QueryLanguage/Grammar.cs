@@ -26,6 +26,8 @@ namespace Fsql.Core.QueryLanguage
         NotEqualOperator,
         GreaterThanOperator,
         LessThanOperator,
+        GreaterThanOrEqualOperator,
+        LessThanOrEqualOperator,
         LeftParenthesis,
         RightParenthesis,
 
@@ -60,6 +62,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.NotEqualOperator] = "(<>|!=)",
                 [Alphabet.GreaterThanOperator] = ">",
                 [Alphabet.LessThanOperator] = "<",
+                [Alphabet.GreaterThanOrEqualOperator] = ">=",
+                [Alphabet.LessThanOrEqualOperator] = "<=",
                 [Alphabet.LeftParenthesis] = "\\(",
                 [Alphabet.RightParenthesis] = "\\)",
             });
@@ -145,6 +149,14 @@ namespace Fsql.Core.QueryLanguage
                     new Token[] { Alphabet.A4, Alphabet.LessThanOperator, Alphabet.A1, new Op(o =>
                     {
                         o[0] = new LessThanExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4, Alphabet.GreaterThanOrEqualOperator, Alphabet.A1, new Op(o =>
+                    {
+                        o[0] = new GreaterThanOrEqualExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4, Alphabet.LessThanOrEqualOperator, Alphabet.A1, new Op(o =>
+                    {
+                        o[0] = new LessThanOrEqualExpression(o[0], o[2]);
                     }) },
                     new Token[] { Alphabet.A1 },
                 },

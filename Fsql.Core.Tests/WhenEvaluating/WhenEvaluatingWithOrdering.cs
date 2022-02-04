@@ -13,7 +13,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "aaa", "ADirectory", "azz", "BDirectory", "ZDirectory" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", new(new[] { new OrderCondition(new("name"), true) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -27,7 +27,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ZDirectory", "BDirectory", "azz", "ADirectory", "aaa" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", new(new[] { new OrderCondition(new("name"), false) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -44,6 +44,7 @@ public class WhenEvaluatingWithOrdering
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
             "./path",
+            null,
             new(new[] { new OrderCondition(new("size"), true) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
@@ -62,6 +63,7 @@ public class WhenEvaluatingWithOrdering
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
             "./path",
+            null,
             new(new[] { new OrderCondition(new("size"), false) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));

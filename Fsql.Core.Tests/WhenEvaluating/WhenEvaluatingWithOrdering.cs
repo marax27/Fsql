@@ -10,10 +10,10 @@ namespace Fsql.Core.Tests.WhenEvaluating;
 public class WhenEvaluatingWithOrdering
 {
     [Fact]
-    public void GivenFilesAndDirectoriesOrderedByNameReturnInCorrectOrder()
+    public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "aaa", "ADirectory", "azz", "BDirectory", "ZDirectory" };
-        var givenQuery = new Query(new[] { "name" }, "./path", new(new[] { "name" }));
+        var givenQuery = new Query(new[] { "name" }, "./path", new(new[] { new OrderCondition("name", true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess());
 
         var result = sut.Evaluate(givenQuery);
@@ -24,10 +24,38 @@ public class WhenEvaluatingWithOrdering
     }
 
     [Fact]
-    public void GivenFilesAndDirectoriesOrderedBySizeReturnInCorrectOrder()
+    public void GivenOrderedByNameDescendingReturnInCorrectOrder()
+    {
+        var expectedNames = new[] { "ZDirectory", "BDirectory", "azz", "ADirectory", "aaa" };
+        var givenQuery = new Query(new[] { "name" }, "./path", new(new[] { new OrderCondition("name", false) }));
+        var sut = new QueryEvaluation(new StubFileSystemAccess());
+
+        var result = sut.Evaluate(givenQuery);
+
+        var actualNames = result.Rows.Select(row => row[0].ToText());
+        actualNames.Should().BeEquivalentTo(expectedNames,
+            o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void GivenOrderedBySizeAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
-        var givenQuery = new Query(new[] { "name", "size" }, "./path", new(new[] { "size" }));
+        var givenQuery = new Query(new[] { "name", "size" }, "./path", new(new[] { new OrderCondition("size", true) }));
+        var sut = new QueryEvaluation(new StubFileSystemAccess());
+
+        var result = sut.Evaluate(givenQuery);
+
+        var actualNames = result.Rows.Select(row => row[0].ToText());
+        actualNames.Should().BeEquivalentTo(expectedNames,
+            o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void GivenOrderedBySizeDescendingReturnInCorrectOrder()
+    {
+        var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
+        var givenQuery = new Query(new[] { "name", "size" }, "./path", new(new[] { new OrderCondition("size", false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess());
 
         var result = sut.Evaluate(givenQuery);

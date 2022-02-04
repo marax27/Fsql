@@ -28,6 +28,29 @@ public class WhenParsingOrderByExpression : IClassFixture<ParserFixture>
     public void GivenOrderBy1NamedAttributeReturnExpectedAttribute(string givenAttribute)
     {
         var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute}");
-        query.OrderByExpression.Attributes.Should().BeEquivalentTo(new[] { givenAttribute });
+        var actualConditions = query.OrderByExpression.Conditions;
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(givenAttribute, true) });
+    }
+
+    [Theory]
+    [InlineData("size")]
+    [InlineData("Name")]
+    [InlineData("CREATE_TIME")]
+    public void GivenOrderBy1NamedAttributeWithAscendingModifierReturnExpectedAttribute(string givenAttribute)
+    {
+        var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute} ASC");
+        var actualConditions = query.OrderByExpression.Conditions;
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(givenAttribute, true) });
+    }
+
+    [Theory]
+    [InlineData("size")]
+    [InlineData("Name")]
+    [InlineData("CREATE_TIME")]
+    public void GivenOrderBy1NamedAttributeWithDescendingModifierReturnExpectedAttribute(string givenAttribute)
+    {
+        var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute} DESC");
+        var actualConditions = query.OrderByExpression.Conditions;
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(givenAttribute, false) });
     }
 }

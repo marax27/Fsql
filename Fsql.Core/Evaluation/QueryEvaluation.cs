@@ -69,8 +69,12 @@ internal class EntryOrdering
         if (_orderByExpression == OrderByExpression.NoOrdering)
             return entries;
 
-        var orderByAttribute = _orderByExpression.Attributes.First();
-        return entries
-            .OrderBy(entry => _context.Get(orderByAttribute, entry));
+        BaseValueType Predicate(BaseFileSystemEntry entry, OrderCondition condition) =>
+            _context.Get(condition.Attribute, entry);
+
+        var condition = _orderByExpression.Conditions.First();
+        return condition.Ascending
+            ? entries.OrderBy(e => Predicate(e, condition))
+            : entries.OrderByDescending(e => Predicate(e, condition));
     }
 }

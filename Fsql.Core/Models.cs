@@ -6,12 +6,14 @@ public record Query(
     OrderByExpression OrderByExpression
 );
 
-public sealed record OrderByExpression(IReadOnlyCollection<string> Attributes)
+public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Conditions)
 {
-    public static OrderByExpression NoOrdering => new (new List<string>());
+    public static OrderByExpression NoOrdering => new (new List<OrderCondition>());
 
     public bool Equals(OrderByExpression? other) =>
-        other is { } && Attributes.SequenceEqual(other.Attributes);
+        other is { } && Conditions.SequenceEqual(other.Conditions);
 
-    public override int GetHashCode() => Attributes.GetHashCode();
+    public override int GetHashCode() => Conditions.GetHashCode();
 }
+
+public sealed record OrderCondition(string Attribute, bool Ascending);

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Fsql.Cli;
+using Fsql.Cli.Settings;
 using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem;
 using Fsql.Core.QueryLanguage;
@@ -9,11 +9,12 @@ Console.WriteLine("Greetings.");
 var access = new FileSystemAccess();
 var parser = new QueryParser();
 
+var readInputStrategy = new ReadOneLineInputStrategy();
+
 while (true)
 {
-    Console.Write("?> ");
-    var input = Console.ReadLine();
-    if (input is null || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
+    var input = readInputStrategy.Read();
+    if (input is null)
         break;
 
 #if (DEBUG)

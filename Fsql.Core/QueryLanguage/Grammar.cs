@@ -1,5 +1,4 @@
 ﻿using CSharpParserGenerator;
-using Fsql.Core.Evaluation;
 
 namespace Fsql.Core.QueryLanguage
 {
@@ -184,8 +183,8 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[] { Alphabet.LeftParenthesis, Alphabet.A7, Alphabet.RightParenthesis },
                     new Token[] { Alphabet.Identifier, new Op(o => { o[0] = new IdentifierReferenceExpression(new(o[0])); }) },
-                    new Token[] { Alphabet.Number, new Op(o => { o[0] = new ConstantExpression(new NumberValueType(double.Parse(o[0]))); }) },
-                    new Token[] { Alphabet.STRING, new Op(o => { o[0] = new ConstantExpression(new StringValueType(o[0])); }) },
+                    new Token[] { Alphabet.Number, new Op(o => { o[0] = new NumberConstant(double.Parse(o[0])); }) },
+                    new Token[] { Alphabet.STRING, new Op(o => { o[0] = new StringConstant(o[0]); }) },
                 },
                 [Alphabet.STRING] = new []
                 {

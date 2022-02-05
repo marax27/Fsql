@@ -14,7 +14,7 @@ public class WhenEvaluatingAttributeConstantEquality
     public void GivenIdentifierAndConstantReturnExpectedResult(double givenConstant, bool expectedResult)
     {
         var givenFirst = new IdentifierReferenceExpression(new("size"));
-        var givenOther = new ConstantExpression(new NumberValueType(givenConstant));
+        var givenOther = new NumberConstant(givenConstant);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(expectedResult));
@@ -26,7 +26,7 @@ public class WhenEvaluatingAttributeConstantEquality
     [InlineData(1235, false)]
     public void GivenConstantAndIdentifierReturnExpectedResult(double givenConstant, bool expectedResult)
     {
-        var givenFirst = new ConstantExpression(new NumberValueType(givenConstant));
+        var givenFirst = new NumberConstant(givenConstant);
         var givenOther = new IdentifierReferenceExpression(new("size"));
 
         Act(givenFirst, givenOther)
@@ -37,7 +37,7 @@ public class WhenEvaluatingAttributeConstantEquality
     public void GivenNameIdentifierAndConstantOfDifferentTypeReturnFalse()
     {
         var givenFirst = new IdentifierReferenceExpression(new("name"));
-        var givenOther = new ConstantExpression(new NumberValueType(1000));
+        var givenOther = new NumberConstant(1000);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -47,7 +47,7 @@ public class WhenEvaluatingAttributeConstantEquality
     public void GivenSizeIdentifierAndConstantOfDifferentTypeReturnFalse()
     {
         var givenFirst = new IdentifierReferenceExpression(new("size"));
-        var givenOther = new ConstantExpression(new StringValueType("..."));
+        var givenOther = new StringConstant("...");
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));

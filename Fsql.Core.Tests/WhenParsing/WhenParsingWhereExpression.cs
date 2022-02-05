@@ -28,7 +28,7 @@ public class WhenParsingWhereExpression : IClassFixture<ParserFixture>
 
         whereExpression.Should().Be(new EqualsExpression(
             new IdentifierReferenceExpression(new("name")),
-            new ConstantExpression(new StringValueType("a.txt"))
+            new StringConstant("a.txt")
         ));
     }
 }

@@ -12,9 +12,19 @@ public abstract record Expression
     public abstract BaseValueType Evaluate(IExpressionContext context);
 }
 
-public record ConstantExpression(BaseValueType Value) : Expression
+public record NumberConstant(double Value) : Expression
 {
-    public override BaseValueType Evaluate(IExpressionContext context) => Value;
+    public override BaseValueType Evaluate(IExpressionContext context) => new NumberValueType(Value);
+}
+
+public record StringConstant(string Value) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context) => new StringValueType(Value);
+}
+
+public record NullConstant : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context) => new NullValueType();
 }
 
 public record IdentifierReferenceExpression(Identifier Identifier) : Expression

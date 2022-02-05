@@ -15,8 +15,8 @@ public class WhenEvaluatingNotEqual
     public void GivenNumbersAndNotEqualOperatorReturnExpectedResult(
         double givenFirstValue, double givenOtherValue, bool expectedResult)
     {
-        var givenFirst = new ConstantExpression(new NumberValueType(givenFirstValue));
-        var givenOther = new ConstantExpression(new NumberValueType(givenOtherValue));
+        var givenFirst = new NumberConstant(givenFirstValue);
+        var givenOther = new NumberConstant(givenOtherValue);
 
         var expression = new NotEqualExpression(givenFirst, givenOther);
 
@@ -33,8 +33,8 @@ public class WhenEvaluatingNotEqual
     public void GivenStringsAndNotEqualOperatorReturnExpectedResult(
         string givenFirstValue, string givenOtherValue, bool expectedResult)
     {
-        var givenFirst = new ConstantExpression(new StringValueType(givenFirstValue));
-        var givenOther = new ConstantExpression(new StringValueType(givenOtherValue));
+        var givenFirst = new StringConstant(givenFirstValue);
+        var givenOther = new StringConstant(givenOtherValue);
 
         var expression = new NotEqualExpression(givenFirst, givenOther);
 

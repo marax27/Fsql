@@ -15,7 +15,7 @@ public class WhenEvaluatingWithWhere
         var nameId = new Identifier("name");
         var whereExpression = new EqualsExpression(
             new IdentifierReferenceExpression(nameId),
-            new ConstantExpression(new StringValueType("example.jpg"))
+            new StringConstant("example.jpg")
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 

@@ -16,8 +16,8 @@ public class WhenEvaluatingGreaterThan
     public void GivenNumbersOperatorReturnExpectedResult(
         double givenFirstValue, double givenOtherValue, bool expectedResult)
     {
-        var givenFirst = new ConstantExpression(new NumberValueType(givenFirstValue));
-        var givenOther = new ConstantExpression(new NumberValueType(givenOtherValue));
+        var givenFirst = new NumberConstant(givenFirstValue);
+        var givenOther = new NumberConstant(givenOtherValue);
 
         var expression = new GreaterThanExpression(givenFirst, givenOther);
 

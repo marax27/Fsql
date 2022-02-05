@@ -10,8 +10,8 @@ public class WhenEvaluatingConstantEquality
     [Fact]
     public void GivenIdenticalNumbersReturnTrue()
     {
-        var givenFirst = new NumberValueType(3.14159);
-        var givenOther = new NumberValueType(3.14159);
+        var givenFirst = new NumberConstant(3.14159);
+        var givenOther = new NumberConstant(3.14159);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(true));
@@ -20,8 +20,8 @@ public class WhenEvaluatingConstantEquality
     [Fact]
     public void GivenDifferentTypesReturnFalse()
     {
-        var givenFirst = new NumberValueType(3.14159);
-        var givenOther = new StringValueType("3.14159");
+        var givenFirst = new NumberConstant(3.14159);
+        var givenOther = new StringConstant("3.14159");
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -31,8 +31,8 @@ public class WhenEvaluatingConstantEquality
     [InlineData(3.14159, 3.14158)]
     public void GivenDifferentNumbersReturnFalse(double givenFirstValue, double givenOtherValue)
     {
-        var givenFirst = new NumberValueType(givenFirstValue);
-        var givenOther = new NumberValueType(givenOtherValue);
+        var givenFirst = new NumberConstant(givenFirstValue);
+        var givenOther = new NumberConstant(givenOtherValue);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -46,8 +46,8 @@ public class WhenEvaluatingConstantEquality
     [InlineData("    ")]
     public void GivenIdenticalStringsReturnTrue(string givenString)
     {
-        var givenFirst = new StringValueType(givenString);
-        var givenOther = new StringValueType(givenString);
+        var givenFirst = new StringConstant(givenString);
+        var givenOther = new StringConstant(givenString);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(true));
@@ -59,8 +59,8 @@ public class WhenEvaluatingConstantEquality
     [InlineData("Long string", "Long string.")]
     public void GivenDifferentStringsReturnFalse(string givenFirstString, string givenOtherString)
     {
-        var givenFirst = new StringValueType(givenFirstString);
-        var givenOther = new StringValueType(givenOtherString);
+        var givenFirst = new StringConstant(givenFirstString);
+        var givenOther = new StringConstant(givenOtherString);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -69,8 +69,8 @@ public class WhenEvaluatingConstantEquality
     [Fact]
     public void GivenNumberAndNullReturnFalse()
     {
-        var givenFirst = new NumberValueType(-100.0);
-        var givenOther = new NullValueType();
+        var givenFirst = new NumberConstant(-100.0);
+        var givenOther = new NullConstant();
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -79,8 +79,8 @@ public class WhenEvaluatingConstantEquality
     [Fact]
     public void GivenNullAndNumberReturnFalse()
     {
-        var givenFirst = new NullValueType();
-        var givenOther = new NumberValueType(-100.0);
+        var givenFirst = new NullConstant();
+        var givenOther = new NumberConstant(-100.0);
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(false));
@@ -89,17 +89,17 @@ public class WhenEvaluatingConstantEquality
     [Fact]
     public void Given2NullsReturnTrue()
     {
-        var givenFirst = new NullValueType();
-        var givenOther = new NullValueType();
+        var givenFirst = new NullConstant();
+        var givenOther = new NullConstant();
 
         Act(givenFirst, givenOther)
             .Should().Be(new BooleanValueType(true));
     }
 
-    private static BaseValueType Act(BaseValueType givenFirst, BaseValueType givenOther)
+    private static BaseValueType Act(Expression givenFirst, Expression givenOther)
     {
         var context = new StubExpressionContext(GivenContextValues);
-        var expression = new EqualsExpression(new ConstantExpression(givenFirst), new ConstantExpression(givenOther));
+        var expression = new EqualsExpression(givenFirst, givenOther);
         return expression.Evaluate(context);
     }
 

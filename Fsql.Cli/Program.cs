@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Fsql.Cli;
 using Fsql.Cli.Settings;
 using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem;

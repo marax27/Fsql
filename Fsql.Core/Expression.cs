@@ -32,57 +32,83 @@ public record IdentifierReferenceExpression(Identifier Identifier) : Expression
     public override BaseValueType Evaluate(IExpressionContext context) => context.Get(Identifier);
 }
 
-public record EqualsExpression(Expression Left, Expression Right) : Expression
+public abstract record BinaryOperatorExpression : Expression
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
+    protected bool EvaluatesToNull(BaseValueType left, BaseValueType right)
     {
-        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
-        return new BooleanValueType(result);
+        return left is NullValueType || right is NullValueType;
     }
 }
 
-public record NotEqualExpression(Expression Left, Expression Right) : Expression
+public record EqualsExpression(Expression Left, Expression Right) : BinaryOperatorExpression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
-        return new BooleanValueType(!result);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(left.Equals(right));
     }
 }
 
-public record GreaterThanExpression(Expression Left, Expression Right) : Expression
+public record NotEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result > 0);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(!left.Equals(right));
     }
 }
 
-public record LessThanExpression(Expression Left, Expression Right) : Expression
+public record GreaterThanExpression(Expression Left, Expression Right) : BinaryOperatorExpression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result < 0);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(left.CompareTo(right) > 0);
     }
 }
 
-public record GreaterThanOrEqualExpression(Expression Left, Expression Right) : Expression
+public record LessThanExpression(Expression Left, Expression Right) : BinaryOperatorExpression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result >= 0);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(left.CompareTo(right) < 0);
     }
 }
 
-public record LessThanOrEqualExpression(Expression Left, Expression Right) : Expression
+public record GreaterThanOrEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result <= 0);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(left.CompareTo(right) >= 0);
+    }
+}
+
+public record LessThanOrEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return EvaluatesToNull(left, right)
+            ? new NullValueType()
+            : new BooleanValueType(left.CompareTo(right) <= 0);
     }
 }
 

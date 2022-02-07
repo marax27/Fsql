@@ -63,7 +63,28 @@ public class DataTypeComparisonDatasets
         new(new DateTimeValueType(new(1999, 11, 5)), new DateTimeValueType(new(1999, 12, 5))),
         new(new DateTimeValueType(new(1999, 12, 5)), new DateTimeValueType(new(1999, 12, 6))),
         new(new DateTimeValueType(DateTime.MinValue), new DateTimeValueType(DateTime.MaxValue)),
-
+        
         new(new BooleanValueType(false), new BooleanValueType(true)),
+    };
+
+    public static IEnumerable<DataTypeComparisonTestCase> ValuesAgainstNull => new DataTypeComparisonTestCase[]
+    {
+        new(new NumberValueType(9.5), new NullValueType()),
+        new(new NumberValueType(0), new NullValueType()),
+        new(new NumberValueType(-1e20), new NullValueType()),
+        new(new NumberValueType(double.MinValue), new NullValueType()),
+        new(new NumberValueType(double.MaxValue), new NullValueType()),
+
+        new(new StringValueType("sample text"), new NullValueType()),
+        new(new StringValueType(""), new NullValueType()),
+
+        new(new BooleanValueType(true), new NullValueType()),
+        new(new BooleanValueType(false), new NullValueType()),
+
+        new(new DateTimeValueType(new(2001, 10, 30, 22, 59, 59)), new NullValueType()),
+        new(new DateTimeValueType(DateTime.MinValue), new NullValueType()),
+        new(new DateTimeValueType(DateTime.MaxValue), new NullValueType()),
+
+        new(new NullValueType(), new NullValueType()),
     };
 }

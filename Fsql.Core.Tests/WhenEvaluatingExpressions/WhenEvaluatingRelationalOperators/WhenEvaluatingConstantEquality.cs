@@ -66,36 +66,6 @@ public class WhenEvaluatingConstantEquality
             .Should().Be(new BooleanValueType(false));
     }
 
-    [Fact]
-    public void GivenNumberAndNullReturnFalse()
-    {
-        var givenFirst = new NumberConstant(-100.0);
-        var givenOther = new NullConstant();
-
-        Act(givenFirst, givenOther)
-            .Should().Be(new BooleanValueType(false));
-    }
-
-    [Fact]
-    public void GivenNullAndNumberReturnFalse()
-    {
-        var givenFirst = new NullConstant();
-        var givenOther = new NumberConstant(-100.0);
-
-        Act(givenFirst, givenOther)
-            .Should().Be(new BooleanValueType(false));
-    }
-
-    [Fact]
-    public void Given2NullsReturnTrue()
-    {
-        var givenFirst = new NullConstant();
-        var givenOther = new NullConstant();
-
-        Act(givenFirst, givenOther)
-            .Should().Be(new BooleanValueType(true));
-    }
-
     private static BaseValueType Act(Expression givenFirst, Expression givenOther)
     {
         var context = new StubExpressionContext(GivenContextValues);

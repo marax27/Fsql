@@ -9,7 +9,7 @@ namespace Fsql.Core.Tests.WhenEvaluatingExpressions.WhenEvaluatingRelationalOper
 public class WhenEvaluatingRelationalOperators
 {
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetEqualsTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetEqualsTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestEqualsExpression(Expression givenLeft, Expression givenRight, bool areEqual)
     {
         var expectedResult = new BooleanValueType(areEqual);
@@ -19,7 +19,7 @@ public class WhenEvaluatingRelationalOperators
     }
 
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetNotEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetNotEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestNotEqualExpression(Expression givenLeft, Expression givenRight, bool areNotEqual)
     {
         var expectedResult = new BooleanValueType(areNotEqual);
@@ -29,7 +29,7 @@ public class WhenEvaluatingRelationalOperators
     }
 
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetLessThanTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetLessThanTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestLessThanExpression(Expression givenLeft, Expression givenRight, bool leftSmaller)
     {
         var expectedResult = new BooleanValueType(leftSmaller);
@@ -39,7 +39,7 @@ public class WhenEvaluatingRelationalOperators
     }
 
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetGreaterThanTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetGreaterThanTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestGreaterThanExpression(Expression givenLeft, Expression givenRight, bool leftGreater)
     {
         var expectedResult = new BooleanValueType(leftGreater);
@@ -49,7 +49,7 @@ public class WhenEvaluatingRelationalOperators
     }
 
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetLessThanOrEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetLessThanOrEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestLessThanOrEqualExpression(Expression givenLeft, Expression givenRight, bool leftLessOrEqual)
     {
         var expectedResult = new BooleanValueType(leftLessOrEqual);
@@ -59,7 +59,7 @@ public class WhenEvaluatingRelationalOperators
     }
 
     [Theory]
-    [MemberData(nameof(WhenEvaluatingRelationalOperators.GetGreaterThanOrEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
+    [MemberData(nameof(GetGreaterThanOrEqualTestCases), MemberType = typeof(WhenEvaluatingRelationalOperators))]
     public void TestGreaterThanOrEqualExpression(Expression givenLeft, Expression givenRight, bool leftGreaterOrEqual)
     {
         var expectedResult = new BooleanValueType(leftGreaterOrEqual);

@@ -32,79 +32,98 @@ public record IdentifierReferenceExpression(Identifier Identifier) : Expression
     public override BaseValueType Evaluate(IExpressionContext context) => context.Get(Identifier);
 }
 
-public record EqualsExpression(Expression Left, Expression Right) : Expression
+public abstract record BinaryOperatorExpression(Expression Left, Expression Right) : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
-        return new BooleanValueType(result);
+        var left = Left.Evaluate(context);
+        var right = Right.Evaluate(context);
+        return left is NullValueType || right is NullValueType
+            ? new NullValueType()
+            : new BooleanValueType(EvaluateOperation(left, right));
     }
+
+    protected abstract bool EvaluateOperation(BaseValueType left, BaseValueType right);
 }
 
-public record NotEqualExpression(Expression Left, Expression Right) : Expression
+public record EqualsExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
-    {
-        var result = Left.Evaluate(context).Equals(Right.Evaluate(context));
-        return new BooleanValueType(!result);
-    }
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => left.Equals(right);
 }
 
-public record GreaterThanExpression(Expression Left, Expression Right) : Expression
+public record NotEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
-    {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result > 0);
-    }
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => !left.Equals(right);
 }
 
-public record LessThanExpression(Expression Left, Expression Right) : Expression
+public record GreaterThanExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
-    {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result < 0);
-    }
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => left.CompareTo(right) > 0;
 }
 
-public record GreaterThanOrEqualExpression(Expression Left, Expression Right) : Expression
+public record LessThanExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
-    {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result >= 0);
-    }
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => left.CompareTo(right) < 0;
 }
 
-public record LessThanOrEqualExpression(Expression Left, Expression Right) : Expression
+public record GreaterThanOrEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
 {
-    public override BaseValueType Evaluate(IExpressionContext context)
-    {
-        var result = Left.Evaluate(context).CompareTo(Right.Evaluate(context));
-        return new BooleanValueType(result <= 0);
-    }
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => left.CompareTo(right) >= 0;
+}
+
+public record LessThanOrEqualExpression(Expression Left, Expression Right) : BinaryOperatorExpression(Left, Right)
+{
+    protected override bool EvaluateOperation(BaseValueType left, BaseValueType right)
+        => left.CompareTo(right) <= 0;
 }
 
 public record AndExpression(Expression Left, Expression Right) : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        // Hopefully, this will sometimes improve performance by skipping the right expression.
-        if (!Left.Evaluate(context).EvaluatesToTrue())
+        var left = CheckType(Left.Evaluate(context));
+        if (left is false)
             return new BooleanValueType(false);
 
-        return new BooleanValueType(Right.Evaluate(context).EvaluatesToTrue());
+        var right = CheckType(Right.Evaluate(context));
+        if (right is false)
+            return new BooleanValueType(false);
+
+        return (left is null || right is null) ? new NullValueType() : new BooleanValueType(true);
     }
+
+    private bool? CheckType(BaseValueType value) => value switch
+    {
+        BooleanValueType boolValue => boolValue.Value,
+        NullValueType _ => null,
+        _ => throw new CastException($"AND operator expects a boolean (or null) argument: {value} received.")
+    };
 }
 
 public record OrExpression(Expression Left, Expression Right) : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
-        if (Left.Evaluate(context).EvaluatesToTrue())
+        var left = CheckType(Left.Evaluate(context));
+        if (left is true)
             return new BooleanValueType(true);
 
-        return new BooleanValueType(Right.Evaluate(context).EvaluatesToTrue());
+        var right = CheckType(Right.Evaluate(context));
+        if (right is true)
+            return new BooleanValueType(true);
+
+        return (left is null || right is null) ? new NullValueType() : new BooleanValueType(false);
     }
+
+    private bool? CheckType(BaseValueType value) => value switch
+    {
+        BooleanValueType boolValue => boolValue.Value,
+        NullValueType _ => null,
+        _ => throw new CastException($"OR operator expects a boolean (or null) argument: {value} received.")
+    };
 }

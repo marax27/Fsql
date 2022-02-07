@@ -77,8 +77,8 @@ namespace Fsql.Core.Evaluation
             other switch
             {
                 BooleanValueType booleanValue => Value == booleanValue.Value
-                    ? booleanValue.Value ? 0 : 1
-                    : booleanValue.Value ? -1 : 0,
+                    ? 0
+                    : (Value ? 1 : -1),
                 _ => TryNullOrThrow(other, nameof(BooleanValueType))
             };
 

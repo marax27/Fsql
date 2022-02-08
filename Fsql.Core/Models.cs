@@ -2,10 +2,12 @@
 
 public record Query(
     IReadOnlyCollection<Identifier> SelectedAttributes,
-    string FromPath,
+    FromExpression FromExpression,
     Expression? WhereExpression,
     OrderByExpression OrderByExpression
 );
+
+public sealed record FromExpression(string Path, bool Recursive);
 
 public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Conditions)
 {

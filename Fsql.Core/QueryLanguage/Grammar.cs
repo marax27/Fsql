@@ -15,6 +15,7 @@ namespace Fsql.Core.QueryLanguage
         Or,
         Ascending,
         Descending,
+        Recursive,
         Separator,
         Number,
         SingleQuoteString,
@@ -36,7 +37,7 @@ namespace Fsql.Core.QueryLanguage
         QUERY, TERM, TERMS, STRING,
         EXPRESSION, A1, A4, A6, A7,
         SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, ORDER_BY_EXPRESSION,
-        ORDER_CONDITION,
+        ORDER_CONDITION, FROM_PATH,
     }
 
     internal class Grammar
@@ -54,6 +55,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Or] = "[oO][rR]",
                 [Alphabet.Ascending] = "[aA][sS][cC]",
                 [Alphabet.Descending] = "[dD][eE][sS][cC]",
+                [Alphabet.Recursive] = "[rR][eE][cC][uU][rR][sS][iI][vV][eE]",
                 [Alphabet.Separator] = ",",
                 [Alphabet.Number] = "[+-]?([0-9]*[.])?[0-9]+",
                 [Alphabet.SingleQuoteString] = "'[^']*'",
@@ -99,8 +101,13 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.FROM_EXPRESSION] = new []
                 {
-                    new Token[]{ Alphabet.From, Alphabet.STRING, new Op(o => { o[0] = o[1]; }) },
-                    new Token[]{ Alphabet.From, Alphabet.Identifier, new Op(o => { o[0] = o[1]; }) },
+                    new Token[]{ Alphabet.From, Alphabet.FROM_PATH, new Op(o => { o[0] = new FromExpression(o[1], false); }) },
+                    new Token[]{ Alphabet.From, Alphabet.FROM_PATH, Alphabet.Recursive, new Op(o => { o[0] = new FromExpression(o[1], true); }) },
+                },
+                [Alphabet.FROM_PATH] = new []
+                {
+                    new Token[]{ Alphabet.STRING },
+                    new Token[]{ Alphabet.Identifier },
                 },
                 [Alphabet.WHERE_EXPRESSION] = new []
                 {

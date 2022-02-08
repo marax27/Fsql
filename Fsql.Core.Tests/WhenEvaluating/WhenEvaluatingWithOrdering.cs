@@ -13,7 +13,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), true) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null, new(new[] { new OrderCondition(new("name"), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -27,7 +27,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, "./path", null, new(new[] { new OrderCondition(new("name"), false) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null, new(new[] { new OrderCondition(new("name"), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -43,7 +43,7 @@ public class WhenEvaluatingWithOrdering
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
-            "./path",
+            new("./path", false),
             null,
             new(new[] { new OrderCondition(new("size"), true) })
         );
@@ -62,7 +62,7 @@ public class WhenEvaluatingWithOrdering
         var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
-            "./path",
+            new("./path", false),
             null,
             new(new[] { new OrderCondition(new("size"), false) })
         );

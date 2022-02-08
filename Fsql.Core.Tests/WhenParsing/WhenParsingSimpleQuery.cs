@@ -29,7 +29,7 @@ public class WhenParsingSimpleQuery : IClassFixture<ParserFixture>
     public void GivenSimplePathThenReturnExpectedPath(string givenPath)
     {
         var result = _parserFixture.Sut.Parse($"SELECT * FROM {givenPath}");
-        result.FromPath.Should().Be(givenPath);
+        result.FromExpression.Path.Should().Be(givenPath);
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public class WhenParsingSimpleQuery : IClassFixture<ParserFixture>
     public void GivenQuotedPathReturnExpectedPath(string givenPath, string expectedPath)
     {
         var result = _parserFixture.Sut.Parse($"SELECT * FROM {givenPath}");
-        result.FromPath.Should().Be(expectedPath);
+        result.FromExpression.Path.Should().Be(expectedPath);
     }
 
     [Fact]

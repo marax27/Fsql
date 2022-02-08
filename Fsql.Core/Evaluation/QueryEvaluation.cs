@@ -33,13 +33,37 @@ public class QueryEvaluation
 
     private IEnumerable<BaseFileSystemEntry> GetFiltered(Query query, IQueryContext<BaseFileSystemEntry> context)
     {
-        var allEntries = _fileSystemAccess.GetEntries(query.FromPath);
+        var allEntries = GetAllEntries(query.FromExpression);
         if (query.WhereExpression is null)
             return allEntries;
         else
         {
             var filtering = new EntryFiltering(query.WhereExpression, context);
             return filtering.Filter(allEntries);
+        }
+    }
+
+    private IEnumerable<BaseFileSystemEntry> GetAllEntries(FromExpression fromExpression)
+    {
+        if (!fromExpression.Recursive)
+        {
+            foreach (var entry in _fileSystemAccess.GetEntries(fromExpression.Path))
+                yield return entry;
+            yield break;
+        }
+
+        var pathsToProcess = new Queue<string>();
+        pathsToProcess.Enqueue(fromExpression.Path);
+
+        while (pathsToProcess.Any())
+        {
+            var path = pathsToProcess.Dequeue();
+            foreach (var entry in _fileSystemAccess.GetEntries(path))
+            {
+                if (entry.Type == FileSystemEntryType.Directory)
+                    pathsToProcess.Enqueue(entry.AbsolutePath);
+                yield return entry;
+            }
         }
     }
 

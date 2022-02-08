@@ -72,7 +72,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
         {
             var attributes = attributeNames.Select(a => new Identifier(a)).ToList();
             var fsAccess = CreateFileSystemAccess();
-            var query = new Query(attributes, "sample-path", null, OrderByExpression.NoOrdering);
+            var query = new Query(attributes, new("sample-path", false), null, OrderByExpression.NoOrdering);
             var sut = new QueryEvaluation(fsAccess);
 
             return sut.Evaluate(query);

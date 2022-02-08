@@ -57,7 +57,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Descending] = "[dD][eE][sS][cC]",
                 [Alphabet.Recursive] = "[rR][eE][cC][uU][rR][sS][iI][vV][eE]",
                 [Alphabet.Separator] = ",",
-                [Alphabet.Number] = "[+-]?([0-9]*[.])?[0-9]+",
+                [Alphabet.Number] = "[+-]?([0-9]*[.])?[0-9]+[a-zA-Z]?",
                 [Alphabet.SingleQuoteString] = "'[^']*'",
                 [Alphabet.DoubleQuoteString] = "\"[^\"]*\"",
                 [Alphabet.PathString] = @"(\.|[a-zA-Z]:|/|\\)\S*",
@@ -188,9 +188,9 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.A1] = new []
                 {
-                    new Token[] { Alphabet.LeftParenthesis, Alphabet.A7, Alphabet.RightParenthesis },
+                    new Token[] { Alphabet.LeftParenthesis, Alphabet.A7, Alphabet.RightParenthesis, new Op(o => { o[0] = o[1]; }) },
                     new Token[] { Alphabet.Identifier, new Op(o => { o[0] = new IdentifierReferenceExpression(new(o[0])); }) },
-                    new Token[] { Alphabet.Number, new Op(o => { o[0] = new NumberConstant(double.Parse(o[0])); }) },
+                    new Token[] { Alphabet.Number, new Op(o => { o[0] = new NumberConstant(ParserUtilities.ParseNumber(o[0])); }) },
                     new Token[] { Alphabet.STRING, new Op(o => { o[0] = new StringConstant(o[0]); }) },
                 },
                 [Alphabet.STRING] = new []

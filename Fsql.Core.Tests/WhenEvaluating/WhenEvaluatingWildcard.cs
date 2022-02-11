@@ -10,7 +10,7 @@ public class WhenEvaluatingWildcard
     public void Given1WildcardAttributeReturnExpectedHeaders()
     {
         var fsAccess = new FakeFileSystemAccess()
-            .WithFiles("./path", "document.txt", "code.cs");
+            .WithFiles("./path", 1024, "document.txt", "code.cs");
         var query = new Query(new []{ new Identifier("*") }, new("./path", false), null, OrderByExpression.NoOrdering);
         var sut = new QueryEvaluation(fsAccess);
 

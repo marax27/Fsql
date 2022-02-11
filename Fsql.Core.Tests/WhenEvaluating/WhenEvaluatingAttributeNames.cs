@@ -80,7 +80,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
 
         private static IFileSystemAccess CreateFileSystemAccess()
             => new FakeFileSystemAccess()
-                .WithFiles("sample-path", "1.txt", "2.txt", "3.jpg")
-                .WithDirectories("sample-path", "sub.dir/");
+                .WithFiles("sample-path", 100, "1.txt", "2.txt", "3.jpg")
+                .WithDirectories("sample-path", 0, "sub.dir/");
     }
 }

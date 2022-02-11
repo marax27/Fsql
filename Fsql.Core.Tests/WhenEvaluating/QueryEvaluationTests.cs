@@ -17,7 +17,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
         {
             var givenPath = "./empty_path";
             var fsAccess = new FakeFileSystemAccess()
-                .WithFiles(givenPath);
+                .WithFiles(givenPath, 1234);
 
             var result = Evaluate(givenPath, fsAccess);
             result.Rows.Should().BeEmpty();
@@ -28,8 +28,8 @@ namespace Fsql.Core.Tests.WhenEvaluating
         {
             var givenPath = "./path";
             var fsAccess = new FakeFileSystemAccess()
-                .WithFiles(givenPath, "file01.txt")
-                .WithDirectories(givenPath, "sub_directory");
+                .WithFiles(givenPath, 500, "file01.txt")
+                .WithDirectories(givenPath, 0, "sub_directory");
 
             var result = Evaluate(givenPath, fsAccess);
             result.Rows.Should().HaveCount(2);
@@ -40,8 +40,8 @@ namespace Fsql.Core.Tests.WhenEvaluating
         {
             var givenPath = "./EXAMPLE_PATH";
             var fsAccess = new FakeFileSystemAccess()
-                .WithFiles(givenPath, "00", "11", "22")
-                .WithFiles("./other-path", "0a", "1b", "2c", "3d", "4e");
+                .WithFiles(givenPath, 200, "00", "11", "22")
+                .WithFiles("./other-path", 300, "0a", "1b", "2c", "3d", "4e");
 
             var result = Evaluate(givenPath, fsAccess);
             result.Rows.Should().HaveCount(3);
@@ -52,8 +52,8 @@ namespace Fsql.Core.Tests.WhenEvaluating
         {
             var givenPath = "./EXAMPLE_PATH";
             var fsAccess = new FakeFileSystemAccess()
-                .WithDirectories(givenPath, "00", "11", "22")
-                .WithDirectories("./other-path", "0a", "1b", "2c", "3d", "4e");
+                .WithDirectories(givenPath, 1234, "00", "11", "22")
+                .WithDirectories("./other-path", 1234, "0a", "1b", "2c", "3d", "4e");
 
             var result = Evaluate(givenPath, fsAccess);
             result.Rows.Should().HaveCount(3);
@@ -70,7 +70,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
     internal record FakeFileSystemEntry : BaseFileSystemEntry
     {
         public override double Size { get; }
-        public override string AbsolutePath => $"/absolute/path/{FullPath}";
+        public override string AbsolutePath => FullPath;
         public override DateTime AccessTime => DateTime.MinValue;
         public override DateTime CreateTime => DateTime.MinValue;
         public override DateTime ModifyTime => DateTime.MinValue;
@@ -86,33 +86,37 @@ namespace Fsql.Core.Tests.WhenEvaluating
     {
         private readonly IDictionary<string, List<BaseFileSystemEntry>> _entries = new Dictionary<string, List<BaseFileSystemEntry>>();
 
-        public FakeFileSystemAccess WithFiles(string rootPath, params string[] fileNames)
+        public FakeFileSystemAccess WithFiles(string rootPath, double fileSize, params string[] fileNames)
         {
             var newEntries = fileNames
-                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File, 1234));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.File, fileSize));
             AppendEntries(rootPath, newEntries);
             return this;
         }
 
-        public FakeFileSystemAccess WithDirectories(string rootPath, params string[] directoryNames)
+        public FakeFileSystemAccess WithDirectories(string rootPath, double dirSize, params string[] directoryNames)
         {
             var newEntries = directoryNames
-                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory, 0));
+                .Select(filename => new FakeFileSystemEntry(Path.Join(rootPath, filename), FileSystemEntryType.Directory, dirSize));
             AppendEntries(rootPath, newEntries);
             return this;
         }
 
         public IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath)
         {
-            return _entries[directoryPath];
+            return _entries[Normalize(directoryPath)];
         }
 
         private void AppendEntries(string directoryPath, IEnumerable<BaseFileSystemEntry> entries)
         {
-            if (_entries.ContainsKey(directoryPath))
-                _entries[directoryPath].AddRange(entries);
-            else
+            var matchingKey = _entries.Keys.SingleOrDefault(key => Normalize(key) == Normalize(directoryPath));
+
+            if (matchingKey is null)
                 _entries[directoryPath] = entries.ToList();
+            else
+                _entries[directoryPath].AddRange(entries);
         }
+
+        private static string Normalize(string key) => key.Replace('\\', '/');
     }
 }

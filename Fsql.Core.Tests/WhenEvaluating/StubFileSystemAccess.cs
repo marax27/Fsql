@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Fsql.Core.FileSystem;
+using Fsql.Core.FileSystem.Abstractions;
 
 namespace Fsql.Core.Tests.WhenEvaluating;
 

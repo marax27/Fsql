@@ -1,20 +1,17 @@
-﻿namespace Fsql.Core.FileSystem;
+﻿using Fsql.Core.FileSystem.Abstractions;
 
-public interface IFileSystemAccess
-{
-    IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath);
-}
+namespace Fsql.Core.FileSystem;
 
 public class FileSystemAccess : IFileSystemAccess
 {
     public IEnumerable<BaseFileSystemEntry> GetEntries(string directoryPath)
     {
         var files = Directory.EnumerateFiles(directoryPath)
-            .Select(path => new FileSystemEntry(path, FileSystemEntryType.File));
+            .Select(path => new FileNodeEntry(path));
 
         var directories = Directory.EnumerateDirectories(directoryPath)
-            .Select(path => new FileSystemEntry(path, FileSystemEntryType.Directory));
+            .Select(path => new DirectoryNodeEntry(path));
 
-        return files.Concat(directories);
+        return files.Concat<BaseFileSystemEntry>(directories);
     }
 }

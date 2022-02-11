@@ -1,4 +1,5 @@
 ﻿using Fsql.Core.FileSystem;
+using Fsql.Core.FileSystem.Abstractions;
 
 namespace Fsql.Core.Evaluation;
 
@@ -27,22 +28,12 @@ public class FileSystemQueryContext : IQueryContext<BaseFileSystemEntry>
             NameAttribute => new StringValueType(Path.GetFileName(entry.FullPath)),
             ExtensionAttribute => GetExtension(entry),
             TypeAttribute => new StringValueType(entry.Type.ToString()),
-            SizeAttribute => GetSize(entry),
+            SizeAttribute => new NumberValueType(entry.Size),
             AbsolutePathAttribute => new StringValueType(entry.AbsolutePath),
             AccessTimeAttribute => new DateTimeValueType(entry.AccessTime),
             CreateTimeAttribute => new DateTimeValueType(entry.CreateTime),
             ModifyTimeAttribute => new DateTimeValueType(entry.ModifyTime),
             _ => throw new ApplicationException($"Unknown attribute: {attribute}.")
-        };
-    }
-
-    private static BaseValueType GetSize(BaseFileSystemEntry entry)
-    {
-        return entry.Type switch
-        {
-            FileSystemEntryType.File => new NumberValueType(entry.Size),
-            FileSystemEntryType.Directory => new NullValueType(),
-            _ => throw new ApplicationException($"Unsupported filesystem entry type: {entry.Type}.")
         };
     }
 

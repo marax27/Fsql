@@ -2,7 +2,7 @@
 using System.Linq;
 using FluentAssertions;
 using Fsql.Core.Evaluation;
-using Fsql.Core.FileSystem;
+using Fsql.Core.FileSystem.Abstractions;
 using Xunit;
 
 namespace Fsql.Core.Tests.WhenEvaluating;
@@ -40,7 +40,7 @@ public class WhenEvaluatingWithOrdering
     [Fact]
     public void GivenOrderedBySizeAscendingReturnInCorrectOrder()
     {
-        var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
+        var expectedNames = new[] { "ZDirectory", "BDirectory", "ADirectory", "azz", "aaa" };
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
             new("./path", false),
@@ -59,7 +59,7 @@ public class WhenEvaluatingWithOrdering
     [Fact]
     public void GivenOrderedBySizeDescendingReturnInCorrectOrder()
     {
-        var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
+        var expectedNames = new[] { "aaa", "azz", "ZDirectory", "BDirectory", "ADirectory" };
         var givenQuery = new Query(
             new[] { new Identifier("name"), new("size") },
             new("./path", false),

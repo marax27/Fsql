@@ -21,4 +21,13 @@ public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Condi
 
 public sealed record OrderCondition(Expression Expression, bool Ascending);
 
-public sealed record Identifier(string Name);
+public sealed record Identifier(string Name)
+{
+    public string Id => Name.ToLowerInvariant();
+
+    public bool Equals(Identifier? other) =>
+        other != null && Id.Equals(other.Id);
+
+    public override int GetHashCode() =>
+        Id.GetHashCode();
+}

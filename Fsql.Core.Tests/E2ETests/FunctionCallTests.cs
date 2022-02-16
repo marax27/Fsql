@@ -72,6 +72,28 @@ public class FunctionCallTests : IClassFixture<ParserFixture>
             o => o.ComparingRecordsByValue().WithStrictOrdering());
     }
 
+    [Theory]
+    [InlineData("SELECT name FROM /home WHERE UPPER(extension) = '.MOV' ORDER BY Lower(NAME)")]
+    [InlineData("SELECT name FROM /home WHERE upper(EXTENSION) = '.MOV' ORDER BY LOWER(Name)")]
+    [InlineData("SELECT name FROM /home WHERE upPER(Extension) = '.MOV' ORDER BY lowER(name)")]
+    public void WhenCallingFunctionWithMixedLowercaseUppercaseIdentifierReturnExpectedValues(string givenInput)
+    {
+        var expectedResult = new[]
+        {
+            new BaseValueType[]{ new StringValueType("a3.mov") },
+            new BaseValueType[]{ new StringValueType("b3.mov") },
+        };
+
+        var evaluation = new QueryEvaluation(FileSystemAccess);
+
+        var query = _parserFixture.Sut.Parse(givenInput);
+
+        var actualResult = evaluation.Evaluate(query);
+
+        actualResult.Rows.Should().BeEquivalentTo(expectedResult,
+            o => o.ComparingRecordsByValue().WithStrictOrdering());
+    }
+
     //[Fact]
     //public void WhenCallingFunctionInSelectExpressionReturnExpectedValues()
     //{

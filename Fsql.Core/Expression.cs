@@ -1,10 +1,12 @@
 ﻿using Fsql.Core.Evaluation;
+using Fsql.Core.Functions;
 
 namespace Fsql.Core;
 
 public interface IExpressionContext
 {
     BaseValueType Get(Identifier identifier);
+    IFunction GetFunction(Identifier identifier);
 }
 
 public abstract record Expression
@@ -25,6 +27,17 @@ public record StringConstant(string Value) : Expression
 public record NullConstant : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context) => new NullValueType();
+}
+
+public record FunctionCall(Identifier Identifier, IReadOnlyList<Identifier> Arguments) : Expression
+{
+    public override BaseValueType Evaluate(IExpressionContext context)
+    {
+        var function = context.GetFunction(Identifier);
+        var arguments = Arguments.Select(context.Get).ToList();
+        var result = function.Evaluate(arguments);
+        return result;
+    }
 }
 
 public record IdentifierReferenceExpression(Identifier Identifier) : Expression

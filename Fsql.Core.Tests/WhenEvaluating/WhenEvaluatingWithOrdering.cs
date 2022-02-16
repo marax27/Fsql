@@ -13,7 +13,8 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null, new(new[] { new OrderCondition(new("name"), true) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null,
+            new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("name")), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -27,7 +28,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
-        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null, new(new[] { new OrderCondition(new("name"), false) }));
+        var givenQuery = new Query(new[] { new Identifier("name") }, new("./path", false), null, new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("name")), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -45,7 +46,7 @@ public class WhenEvaluatingWithOrdering
             new[] { new Identifier("name"), new("size") },
             new("./path", false),
             null,
-            new(new[] { new OrderCondition(new("size"), true) })
+            new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("size")), true) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
@@ -64,7 +65,7 @@ public class WhenEvaluatingWithOrdering
             new[] { new Identifier("name"), new("size") },
             new("./path", false),
             null,
-            new(new[] { new OrderCondition(new("size"), false) })
+            new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("size")), false) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 

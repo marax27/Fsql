@@ -54,12 +54,8 @@ public class SimpleQueryWithOrderingTests : IClassFixture<ParserFixture>
 
         var actualResult = evaluation.Evaluate(query).Rows.ToList();
 
-        actualResult.Should().HaveCount(expectedResult.Length);
-        for (var i = 0; i < expectedResult.Length; ++i)
-        {
-            actualResult[i].Should().BeEquivalentTo(expectedResult[i],
-                o => o.ComparingRecordsByValue().WithStrictOrdering());
-        }
+        actualResult.Should().BeEquivalentTo(expectedResult,
+            o => o.ComparingRecordsByValue().WithStrictOrdering());
     }
 
     [Fact]
@@ -113,11 +109,7 @@ public class SimpleQueryWithOrderingTests : IClassFixture<ParserFixture>
 
         var actualResult = evaluation.Evaluate(query).Rows.ToList();
 
-        actualResult.Should().HaveCount(expectedResult.Length);
-        for (var i = 0; i < expectedResult.Length; ++i)
-        {
-            actualResult[i].Should().BeEquivalentTo(expectedResult[i],
-                o => o.ComparingRecordsByValue().WithStrictOrdering());
-        }
+        actualResult.Should().BeEquivalentTo(expectedResult,
+            o => o.ComparingRecordsByValue().WithStrictOrdering());
     }
 }

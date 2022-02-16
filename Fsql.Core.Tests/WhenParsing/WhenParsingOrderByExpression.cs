@@ -29,7 +29,7 @@ public class WhenParsingOrderByExpression : IClassFixture<ParserFixture>
     {
         var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute}");
         var actualConditions = query.OrderByExpression.Conditions;
-        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new(givenAttribute), true) });
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new IdentifierReferenceExpression(new(givenAttribute)), true) });
     }
 
     [Theory]
@@ -40,7 +40,7 @@ public class WhenParsingOrderByExpression : IClassFixture<ParserFixture>
     {
         var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute} ASC");
         var actualConditions = query.OrderByExpression.Conditions;
-        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new(givenAttribute), true) });
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new IdentifierReferenceExpression(new(givenAttribute)), true) });
     }
 
     [Theory]
@@ -51,6 +51,6 @@ public class WhenParsingOrderByExpression : IClassFixture<ParserFixture>
     {
         var query = _parserFixture.Sut.Parse($"SELECT * FROM ./path ORDER BY {givenAttribute} DESC");
         var actualConditions = query.OrderByExpression.Conditions;
-        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new(givenAttribute), false) });
+        actualConditions.Should().BeEquivalentTo(new[] { new OrderCondition(new IdentifierReferenceExpression(new(givenAttribute)), false) });
     }
 }

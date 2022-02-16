@@ -2,6 +2,15 @@
 
 namespace Fsql.Core.Evaluation
 {
+    public enum DataTypes
+    {
+        Null,
+        String,
+        Number,
+        DateTime,
+        Boolean,
+    }
+
     public abstract record BaseValueType : IComparable<BaseValueType>
     {
         public abstract string ToText();
@@ -9,6 +18,8 @@ namespace Fsql.Core.Evaluation
         public abstract int CompareTo(BaseValueType? other);
 
         public abstract bool EvaluatesToTrue();
+
+        public abstract DataTypes Type { get; }
 
         protected int TryNullOrThrow(BaseValueType? other, string castTypeName) =>
             other switch
@@ -30,6 +41,8 @@ namespace Fsql.Core.Evaluation
             };
 
         public override bool EvaluatesToTrue() => Value.Length != 0;
+
+        public override DataTypes Type => DataTypes.String;
     }
 
     public sealed record NullValueType : BaseValueType
@@ -39,6 +52,8 @@ namespace Fsql.Core.Evaluation
         public override int CompareTo(BaseValueType? other) => 1;
      
         public override bool EvaluatesToTrue() => false;
+
+        public override DataTypes Type => DataTypes.Null;
     }
 
     public sealed record NumberValueType(double Value) : BaseValueType
@@ -53,6 +68,8 @@ namespace Fsql.Core.Evaluation
             };
 
         public override bool EvaluatesToTrue() => Value != 0.0;
+
+        public override DataTypes Type => DataTypes.Number;
     }
 
     public sealed record DateTimeValueType(DateTime DateTime) : BaseValueType
@@ -67,6 +84,8 @@ namespace Fsql.Core.Evaluation
             };
 
         public override bool EvaluatesToTrue() => true;
+
+        public override DataTypes Type => DataTypes.DateTime;
     }
 
     public sealed record BooleanValueType(bool Value) : BaseValueType
@@ -83,6 +102,8 @@ namespace Fsql.Core.Evaluation
             };
 
         public override bool EvaluatesToTrue() => Value;
+
+        public override DataTypes Type => DataTypes.Boolean;
     }
 
     public class CastException : ApplicationException

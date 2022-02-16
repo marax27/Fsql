@@ -1,5 +1,5 @@
-﻿using Fsql.Core.FileSystem;
-using Fsql.Core.FileSystem.Abstractions;
+﻿using Fsql.Core.FileSystem.Abstractions;
+using Fsql.Core.Functions;
 
 namespace Fsql.Core.Evaluation;
 
@@ -107,7 +107,7 @@ internal class EntryOrdering
             return entries;
 
         BaseValueType Predicate(BaseFileSystemEntry entry, OrderCondition condition) =>
-            _context.Get(condition.Attribute, entry);
+            condition.Expression.Evaluate(new ExpressionContext(_context, entry));
 
         var condition = _orderByExpression.Conditions.First();
         return condition.Ascending
@@ -145,6 +145,8 @@ internal class ExpressionContext : IExpressionContext
     private readonly IQueryContext<BaseFileSystemEntry> _queryContext;
     private readonly BaseFileSystemEntry _entry;
 
+    private readonly IReadOnlyDictionary<Identifier, IFunction> _functions = new StringFunctionsModule().Load();
+
     public ExpressionContext(IQueryContext<BaseFileSystemEntry> queryContext, BaseFileSystemEntry entry)
     {
         _queryContext = queryContext ?? throw new ArgumentNullException(nameof(queryContext));
@@ -154,5 +156,10 @@ internal class ExpressionContext : IExpressionContext
     public BaseValueType Get(Identifier identifier)
     {
         return _queryContext.Get(identifier, _entry);
+    }
+
+    public IFunction GetFunction(Identifier identifier)
+    {
+        return _functions[identifier];
     }
 }

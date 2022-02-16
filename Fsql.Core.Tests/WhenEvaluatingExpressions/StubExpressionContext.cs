@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Fsql.Core.Evaluation;
+using Fsql.Core.Functions;
 
 namespace Fsql.Core.Tests.WhenEvaluatingExpressions;
 
@@ -13,4 +15,6 @@ internal class StubExpressionContext : IExpressionContext
     }
 
     public BaseValueType Get(Identifier identifier) => Values[identifier];
+
+    public IFunction GetFunction(Identifier identifier) => throw new NotImplementedException();
 }

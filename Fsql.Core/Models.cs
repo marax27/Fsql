@@ -19,6 +19,6 @@ public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Condi
     public override int GetHashCode() => Conditions.GetHashCode();
 }
 
-public sealed record OrderCondition(Identifier Attribute, bool Ascending);
+public sealed record OrderCondition(Expression Expression, bool Ascending);
 
 public sealed record Identifier(string Name);

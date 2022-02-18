@@ -15,6 +15,8 @@ namespace Fsql.Core.QueryLanguage
         Or,
         Ascending,
         Descending,
+        Not,
+        Like,
         Recursive,
         Separator,
         Number,
@@ -55,6 +57,8 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Or] = "[oO][rR]",
                 [Alphabet.Ascending] = "[aA][sS][cC]",
                 [Alphabet.Descending] = "[dD][eE][sS][cC]",
+                [Alphabet.Not] = "[nN][oO][tT]",
+                [Alphabet.Like] = "[lL][iI][kK][eE]",
                 [Alphabet.Recursive] = "[rR][eE][cC][uU][rR][sS][iI][vV][eE]",
                 [Alphabet.Separator] = ",",
                 [Alphabet.Number] = "[+-]?([0-9]*[.])?[0-9]+[a-zA-Z]?",
@@ -156,6 +160,14 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.A7] = new[]
                 {
+                    new Token[] { Alphabet.A7, Alphabet.Like, Alphabet.A6, new Op(o =>
+                    {
+                        o[0] = new LikeOperatorExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A7, Alphabet.Not, Alphabet.Like, Alphabet.A6, new Op(o =>
+                    {
+                        o[0] = new NotLikeOperatorExpression(o[0], o[3]);
+                    }) },
                     new Token[] { Alphabet.A7, Alphabet.Or, Alphabet.A6, new Op(o =>
                     {
                         o[0] = new OrExpression(o[0], o[2]);

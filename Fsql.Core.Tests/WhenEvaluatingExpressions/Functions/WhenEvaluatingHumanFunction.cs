@@ -22,6 +22,7 @@ public class WhenEvaluatingHumanFunction
     }
 
     [Theory]
+    [InlineData(118932482, "113M")]
     [InlineData(1024, "1.0k")]
     [InlineData(1536, "1.5k")]
     [InlineData(2040, "2.0k")]

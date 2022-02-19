@@ -29,7 +29,7 @@ public class HumanFunction : BaseUnaryFunction<NumberValueType, StringValueType>
 
             if (value < kilo)
             {
-                var resultText = (value >= 10.0 || unit == "") ? $"{value}" : $"{value:0.0}";
+                var resultText = (value >= 10.0 || unit == "") ? $"{value:0}" : $"{value:0.0}";
                 return new StringValueType(resultText + unit);
             }
 

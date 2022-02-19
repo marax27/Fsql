@@ -1,4 +1,4 @@
-﻿namespace Fsql.Cli;
+﻿namespace Fsql.Cli.Terminal;
 
 internal class ConsoleUtilities
 {

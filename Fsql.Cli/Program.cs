@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
-using Fsql.Cli;
+using Fsql.Cli.Models;
 using Fsql.Cli.Settings;
+using Fsql.Cli.Terminal;
 using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem;
 using Fsql.Core.QueryLanguage;
@@ -11,6 +12,7 @@ var access = new FileSystemAccess();
 var parser = new QueryParser();
 
 var readInputStrategy = new ReadOneLineInputStrategy();
+var columnWidthStrategy = new DynamicColumnWidthStrategy();
 
 while (true)
 {
@@ -63,16 +65,13 @@ QueryEvaluationResult HandleQuery(string input)
 
 void DisplayQueryResults(QueryEvaluationResult evaluationResult)
 {
-    var attributeNames = evaluationResult.AttributeNames;
-    Console.WriteLine(FormatRow(attributeNames));
 
-    Console.WriteLine(new string('-', 100));
+    var rows = evaluationResult.Rows
+        .Select(row => row.Select(value => value.ToText()).ToArray())
+        .ToArray();
+    var tableModel = new TableModel(evaluationResult.AttributeNames.ToArray(), rows);
 
-    foreach (var row in evaluationResult.Rows)
-    {
-        Console.WriteLine(FormatRow(row.Select(value => value.ToText())));
-    }
-
-    string FormatRow(IEnumerable<string> values)
-        => string.Join(" | ", values.Select(value => value.PadRight(25)));
+    var tableView = new TableView(columnWidthStrategy);
+    foreach (var line in tableView.Render(tableModel))
+        Console.WriteLine(line);
 }

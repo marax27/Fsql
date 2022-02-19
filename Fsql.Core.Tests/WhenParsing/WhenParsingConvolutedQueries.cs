@@ -25,4 +25,24 @@ public class WhenParsingConvolutedQueries : IClassFixture<ParserFixture>
 
         actualResult.WhereExpression.Should().Be(expectedExpression);
     }
+
+    [Fact]
+    public void GivenAndOperatorAndLikeOperatorReturnExpectedQuery()
+    {
+        var expectedExpression = new AndExpression(
+            new EqualsExpression(
+                new IdentifierReferenceExpression(new("type")),
+                new StringConstant("File")
+            ),
+            new LikeOperatorExpression(
+                new IdentifierReferenceExpression(new("name")),
+                new StringConstant("%a%")
+            )
+        );
+
+        var givenInput = "SELECT * FROM ./path WHERE type='File' AND name LIKE '%a%'";
+        var actualResult = _parserFixture.Sut.Parse(givenInput);
+
+        actualResult.WhereExpression.Should().Be(expectedExpression);
+    }
 }

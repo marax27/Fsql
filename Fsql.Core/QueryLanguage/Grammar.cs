@@ -160,14 +160,6 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.A7] = new[]
                 {
-                    new Token[] { Alphabet.A7, Alphabet.Like, Alphabet.A6, new Op(o =>
-                    {
-                        o[0] = new LikeOperatorExpression(o[0], o[2]);
-                    }) },
-                    new Token[] { Alphabet.A7, Alphabet.Not, Alphabet.Like, Alphabet.A6, new Op(o =>
-                    {
-                        o[0] = new NotLikeOperatorExpression(o[0], o[3]);
-                    }) },
                     new Token[] { Alphabet.A7, Alphabet.Or, Alphabet.A6, new Op(o =>
                     {
                         o[0] = new OrExpression(o[0], o[2]);
@@ -207,6 +199,14 @@ namespace Fsql.Core.QueryLanguage
                     new Token[] { Alphabet.A4, Alphabet.LessThanOrEqualOperator, Alphabet.A1, new Op(o =>
                     {
                         o[0] = new LessThanOrEqualExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4, Alphabet.Like, Alphabet.A1, new Op(o =>
+                    {
+                        o[0] = new LikeOperatorExpression(o[0], o[2]);
+                    }) },
+                    new Token[] { Alphabet.A4, Alphabet.Not, Alphabet.Like, Alphabet.A1, new Op(o =>
+                    {
+                        o[0] = new NotLikeOperatorExpression(o[0], o[3]);
                     }) },
                     new Token[] { Alphabet.A1 },
                 },

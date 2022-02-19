@@ -36,10 +36,10 @@ namespace Fsql.Core.QueryLanguage
         RightParenthesis,
 
         // Non-terminal symbols.
-        QUERY, TERM, TERMS, STRING,
+        QUERY, SELECT_TERMS, STRING,
         EXPRESSION, A1, A4, A6, A7,
         SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, ORDER_BY_EXPRESSION,
-        ORDER_CONDITION, FROM_PATH, FUNCTION_CALL,
+        ORDER_CONDITION, FROM_PATH, FUNCTION_CALL, FUNCTION_ARGUMENTS,
     }
 
     internal class Grammar
@@ -101,7 +101,7 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.SELECT_EXPRESSION] = new []
                 {
-                    new Token[]{ Alphabet.Select, Alphabet.TERMS, new Op(o => { o[0] = o[1]; }) },
+                    new Token[]{ Alphabet.Select, Alphabet.SELECT_TERMS, new Op(o => { o[0] = o[1]; }) },
                 },
                 [Alphabet.FROM_EXPRESSION] = new []
                 {
@@ -234,29 +234,47 @@ namespace Fsql.Core.QueryLanguage
                 },
                 [Alphabet.FUNCTION_CALL] = new []
                 {
-                    new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.TERMS, Alphabet.RightParenthesis, new Op(o =>
+                    new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, new Op(o =>
                     {
-                        o[0] = new FunctionCall(new Identifier(o[0]), o[2]);
+                        o[0] = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
                     }) },
                 },
-                [Alphabet.TERMS] = new []
+                [Alphabet.SELECT_TERMS] = new []
                 {
-                    new Token[]{ Alphabet.TERM, new Op(o =>
+                    new Token[]{ Alphabet.Identifier, new Op(o =>
                     {
-                        o[0] = new List<Identifier>{ new Identifier(o[0]) };
+                        var term = new IdentifierReferenceExpression(new(o[0]));
+                        o[0] = new List<Expression>{ term };
                     }) },
-                    new Token[]{ Alphabet.TERM, Alphabet.Separator, Alphabet.TERMS, new Op(o =>
+                    new Token[]{ Alphabet.Wildcard, new Op(o =>
                     {
-                        var terms = new List<Identifier>{ new Identifier(o[0]) };
-                        terms.AddRange(o[2]);
-                        o[0] = terms;
-                    }) }
+                        var term = new IdentifierReferenceExpression(new(o[0]));
+                        o[0] = new List<Expression>{ term };
+                    }) },
+                    new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, new Op(o =>
+                    {
+                        var term = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
+                        o[0] = new List<Expression>{ term };
+                    }) },
+                    new Token[]{ Alphabet.Identifier, Alphabet.Separator, Alphabet.SELECT_TERMS, new Op(o =>
+                    {
+                        var term = new IdentifierReferenceExpression(new(o[0]));
+                        o[0] = new List<Expression>{ term };
+                        o[0].AddRange(o[2]);
+                    }) },
+                    new Token[]{ Alphabet.Wildcard, Alphabet.Separator, Alphabet.SELECT_TERMS, new Op(o =>
+                    {
+                        var term = new IdentifierReferenceExpression(new(o[0]));
+                        o[0] = new List<Expression>{ term };
+                        o[0].AddRange(o[2]);
+                    }) },
+                    new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, Alphabet.Separator, Alphabet.SELECT_TERMS, new Op(o =>
+                    {
+                        var term = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
+                        o[0] = new List<Expression>{ term };
+                        o[0].AddRange(o[5]);
+                    }) },
                 },
-                [Alphabet.TERM] = new []
-                {
-                    new Token[]{ Alphabet.Identifier },
-                    new Token[]{ Alphabet.Wildcard },
-                }
             });
     }
 }

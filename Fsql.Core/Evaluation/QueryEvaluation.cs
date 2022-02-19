@@ -28,8 +28,19 @@ public class QueryEvaluation
         var orderedRows = ComputeOrderBy(filteredRows, query.OrderByExpression);
         var selectResult = ComputeSelect(orderedRows, expandedAttributes).ToList();
 
-        var attributeNames = expandedAttributes.Select(attribute => attribute.Name).ToList();
+        var attributeNames = GetAttributeNames(expandedAttributes);
         return new(attributeNames, selectResult);
+    }
+
+    private IReadOnlyCollection<string> GetAttributeNames(IEnumerable<Expression> expandedAttributes)
+    {
+        return expandedAttributes
+            .Select(attribute => attribute switch
+            {
+                IdentifierReferenceExpression idReference => idReference.Identifier.Name,
+                _ => "?"
+            })
+            .ToArray();
     }
 
     private IEnumerable<IRow> ComputeFrom(FromExpression fromExpression, IQueryContext<BaseFileSystemEntry> queryContext)
@@ -86,19 +97,25 @@ public class QueryEvaluation
             : rows.OrderByDescending(row => Predicate(row, condition));
     }
 
-    private IEnumerable<BaseValueType[]> ComputeSelect(IEnumerable<IRow> rows, IReadOnlyCollection<Identifier> attributes)
+    private IEnumerable<BaseValueType[]> ComputeSelect(IEnumerable<IRow> rows, IReadOnlyCollection<Expression> attributes)
     {
-        return rows.Select(row => attributes.Select(row.Get).ToArray());
+        return rows.Select(row =>
+        {
+            var context = new ExpressionContext(row, _functions);
+            return attributes
+                .Select(attribute => attribute.Evaluate(context))
+                .ToArray();
+        });
     }
 
-    private IReadOnlyCollection<Identifier> ExpandAttributes(
-        IEnumerable<Identifier> attributes, IReadOnlyCollection<Identifier> wildcardAttributes)
+    private IReadOnlyCollection<Expression> ExpandAttributes(
+        IEnumerable<Expression> attributes, IReadOnlyCollection<Identifier> wildcardAttributes)
     {
-        var result = new List<Identifier>();
+        var result = new List<Expression>();
         foreach (var attribute in attributes)
         {
-            if (attribute.Name.Equals("*"))
-                result.AddRange(wildcardAttributes);
+            if (attribute is IdentifierReferenceExpression idExpression && idExpression.Identifier == Identifier.Wildcard)
+                result.AddRange(wildcardAttributes.Select(a => new IdentifierReferenceExpression(a)));
             else
                 result.Add(attribute);
         }

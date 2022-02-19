@@ -29,12 +29,12 @@ public record NullConstant : Expression
     public override BaseValueType Evaluate(IExpressionContext context) => new NullValueType();
 }
 
-public record FunctionCall(Identifier Identifier, IReadOnlyList<Identifier> Arguments) : Expression
+public record FunctionCall(Identifier Identifier, IReadOnlyList<Expression> Arguments) : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {
         var function = context.GetFunction(Identifier);
-        var arguments = Arguments.Select(context.Get).ToList();
+        var arguments = Arguments.Select(arg => arg.Evaluate(context)).ToList();
         var result = function.Evaluate(arguments);
         return result;
     }

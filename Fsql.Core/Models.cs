@@ -1,7 +1,7 @@
 ﻿namespace Fsql.Core;
 
 public record Query(
-    IReadOnlyCollection<Identifier> SelectedAttributes,
+    IReadOnlyCollection<Expression> SelectedAttributes,
     FromExpression FromExpression,
     Expression? WhereExpression,
     OrderByExpression OrderByExpression
@@ -30,4 +30,6 @@ public sealed record Identifier(string Name)
 
     public override int GetHashCode() =>
         Id.GetHashCode();
+
+    public static Identifier Wildcard => new("*");
 }

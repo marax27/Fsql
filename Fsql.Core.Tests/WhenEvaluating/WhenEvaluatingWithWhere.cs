@@ -19,7 +19,7 @@ public class WhenEvaluatingWithWhere
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
-        var givenQuery = new Query(new[] { nameId }, new("./path", false), whereExpression, OrderByExpression.NoOrdering);
+        var givenQuery = new Query(new[] { new IdentifierReferenceExpression(nameId) }, new("./path", false), whereExpression, OrderByExpression.NoOrdering);
 
         var result = sut.Evaluate(givenQuery);
         result.Rows.Should().HaveCount(1);

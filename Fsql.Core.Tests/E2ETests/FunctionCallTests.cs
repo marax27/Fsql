@@ -94,19 +94,19 @@ public class FunctionCallTests : IClassFixture<ParserFixture>
             o => o.ComparingRecordsByValue().WithStrictOrdering());
     }
 
-    //[Fact]
-    //public void WhenCallingFunctionInSelectExpressionReturnExpectedValues()
-    //{
-    //    var givenInput = "SELECT name,human(size),upper(extension) FROM /home";
-    //    var query = _parserFixture.Sut.Parse(givenInput);
-    //}
+    [Fact]
+    public void WhenCallingFunctionInSelectExpressionReturnExpectedValues()
+    {
+        var givenInput = "SELECT name,human(size),upper(extension) FROM /home";
+        var query = _parserFixture.Sut.Parse(givenInput);
+    }
 
-    //[Fact]
-    //public void WhenCallingFunctionWithMixedUppercaseLowercaseCharactersReturnExpectedValues()
-    //{
-    //    var givenInput = "SELECT name,HUMAN(size),Upper(extension) FROM /home";
-    //    var query = _parserFixture.Sut.Parse(givenInput);
-    //}
+    [Fact]
+    public void WhenCallingFunctionWithMixedUppercaseLowercaseCharactersReturnExpectedValues()
+    {
+        var givenInput = "SELECT name,HUMAN(size),Upper(extension) FROM /home";
+        var query = _parserFixture.Sut.Parse(givenInput);
+    }
 
     private IFileSystemAccess FileSystemAccess =>
         new FakeFileSystemAccess()

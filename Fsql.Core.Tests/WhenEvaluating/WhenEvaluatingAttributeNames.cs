@@ -70,7 +70,10 @@ namespace Fsql.Core.Tests.WhenEvaluating
 
         private static QueryEvaluationResult Evaluate(IReadOnlyCollection<string> attributeNames)
         {
-            var attributes = attributeNames.Select(a => new Identifier(a)).ToList();
+            var attributes = attributeNames
+                .Select(a => new Identifier(a))
+                .Select(id => new IdentifierReferenceExpression(id))
+                .ToList();
             var fsAccess = CreateFileSystemAccess();
             var query = new Query(attributes, new("sample-path", false), null, OrderByExpression.NoOrdering);
             var sut = new QueryEvaluation(fsAccess);

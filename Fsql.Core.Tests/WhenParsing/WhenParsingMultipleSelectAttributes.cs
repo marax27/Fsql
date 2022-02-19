@@ -16,7 +16,7 @@ public class WhenParsingMultipleSelectAttributes : IClassFixture<ParserFixture>
     public void GivenWildcardAttributeThenReturnExpectedAttributes()
     {
         var result = _parserFixture.Sut.Parse("SELECT * FROM ./path");
-        result.SelectedAttributes.Should().BeEquivalentTo(new Identifier[] { new("*") });
+        result.SelectedAttributes.Should().BeEquivalentTo(new IdentifierReferenceExpression[] { new(new("*")) });
     }
 
     [Theory]
@@ -27,14 +27,14 @@ public class WhenParsingMultipleSelectAttributes : IClassFixture<ParserFixture>
     public void Given1NamedAttributeThenReturnExpectedAttributes(string givenAttributeName)
     {
         var result = _parserFixture.Sut.Parse($"SELECT {givenAttributeName} FROM ./path");
-        result.SelectedAttributes.Should().BeEquivalentTo(new Identifier[] { new(givenAttributeName) });
+        result.SelectedAttributes.Should().BeEquivalentTo(new IdentifierReferenceExpression[] { new(new(givenAttributeName)) });
     }
 
     [Fact]
     public void Given2NamedAttributesThenReturnExpectedAttributes()
     {
         var result = _parserFixture.Sut.Parse("SELECT alpha, bravo FROM path");
-        result.SelectedAttributes.Should().BeEquivalentTo(new Identifier[] { new("alpha"), new("bravo") },
+        result.SelectedAttributes.Should().BeEquivalentTo(new IdentifierReferenceExpression[] { new(new("alpha")), new(new("bravo")) },
             o => o.WithStrictOrdering());
     }
 
@@ -42,7 +42,7 @@ public class WhenParsingMultipleSelectAttributes : IClassFixture<ParserFixture>
     public void GivenMixedWildcardAndNamedAttributesThenReturnExpectedAttributes()
     {
         var result = _parserFixture.Sut.Parse("SELECT *, middle, * FROM path");
-        result.SelectedAttributes.Should().BeEquivalentTo(new Identifier[] { new("*"), new("middle"), new("*") },
+        result.SelectedAttributes.Should().BeEquivalentTo(new IdentifierReferenceExpression[] { new(new("*")), new(new("middle")), new(new("*")) },
             o => o.WithStrictOrdering());
     }
 
@@ -50,7 +50,7 @@ public class WhenParsingMultipleSelectAttributes : IClassFixture<ParserFixture>
     public void GivenWildcardTwiceThenReturnExpectedAttributes()
     {
         var result = _parserFixture.Sut.Parse("SELECT *,* FROM path");
-        result.SelectedAttributes.Should().BeEquivalentTo(new Identifier[] { new("*"), new("*") },
+        result.SelectedAttributes.Should().BeEquivalentTo(new IdentifierReferenceExpression[] { new(new("*")), new(new("*")) },
             o => o.WithStrictOrdering());
     }
 }

@@ -5,7 +5,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingSimpleQuery : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingSimpleQuery
 {
     private readonly ParserFixture _parserFixture;
 

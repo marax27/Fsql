@@ -7,7 +7,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.E2ETests;
 
-public class GroupByTests : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class GroupByTests
 {
     private readonly ParserFixture _parserFixture;
 

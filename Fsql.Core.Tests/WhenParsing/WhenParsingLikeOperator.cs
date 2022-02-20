@@ -3,7 +3,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingLikeOperator : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingLikeOperator
 {
     private readonly ParserFixture _parserFixture;
 

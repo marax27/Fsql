@@ -5,7 +5,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingRecursiveKeyword : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingRecursiveKeyword
 {
     private readonly ParserFixture _parserFixture;
 

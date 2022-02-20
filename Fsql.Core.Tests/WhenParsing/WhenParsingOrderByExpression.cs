@@ -4,7 +4,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingOrderByExpression : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingOrderByExpression
 {
     private readonly ParserFixture _parserFixture;
 

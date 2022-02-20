@@ -8,7 +8,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.E2ETests;
 
-public class WhereStatementTests : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhereStatementTests
 {
     private readonly ParserFixture _parserFixture;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Fsql.Core.QueryLanguage;
+using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
@@ -20,4 +21,10 @@ public sealed class ParserFixture : IDisposable
     {
 
     }
+}
+
+[CollectionDefinition("Parser test collection")]
+public sealed class ParserTestCollection : ICollectionFixture<ParserFixture>
+{
+
 }

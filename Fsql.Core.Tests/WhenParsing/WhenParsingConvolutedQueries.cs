@@ -3,7 +3,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingConvolutedQueries : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingConvolutedQueries
 {
     private readonly ParserFixture _parserFixture;
 

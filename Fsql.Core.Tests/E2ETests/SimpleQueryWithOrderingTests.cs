@@ -7,7 +7,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.E2ETests;
 
-public class SimpleQueryWithOrderingTests : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class SimpleQueryWithOrderingTests
 {
     private readonly ParserFixture _parserFixture;
 

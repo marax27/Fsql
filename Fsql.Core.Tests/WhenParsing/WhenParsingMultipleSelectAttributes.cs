@@ -3,7 +3,8 @@ using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;
 
-public class WhenParsingMultipleSelectAttributes : IClassFixture<ParserFixture>
+[Collection("Parser test collection")]
+public class WhenParsingMultipleSelectAttributes
 {
     private readonly ParserFixture _parserFixture;
 

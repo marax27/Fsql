@@ -10,9 +10,9 @@ public record Query(
 
 public sealed record FromExpression(string Path, bool Recursive);
 
-public sealed record GroupByExpression(IReadOnlyCollection<Identifier> Attributes)
+public sealed record GroupByExpression(IReadOnlyCollection<Expression> Attributes)
 {
-    public static GroupByExpression NoGrouping => new(Array.Empty<Identifier>());
+    public static GroupByExpression NoGrouping => new(Array.Empty<Expression>());
 
     public bool Equals(GroupByExpression? other) =>
         other is { } && Attributes.SequenceEqual(other.Attributes);

@@ -21,6 +21,8 @@ public class SingleRowExpressionContext : IExpressionContext
         var result = _functions[identifier].Evaluate(argumentValues);
         return result;
     }
+
+    public BaseValueType? TryGetCached(Expression expression) => null;
 }
 
 public class AggregateExpressionContext : IExpressionContext
@@ -28,6 +30,7 @@ public class AggregateExpressionContext : IExpressionContext
     private readonly IRowAggregate _aggregate;
     private readonly IReadOnlyDictionary<Identifier, IFunction> _functions;
     private readonly IReadOnlyDictionary<Identifier, IAggregateFunction> _aggregateFunctions;
+    private readonly IReadOnlyDictionary<Expression, BaseValueType> _expressionCache;
 
     public AggregateExpressionContext(IRowAggregate aggregate,
         IReadOnlyDictionary<Identifier, IFunction> functions,
@@ -36,9 +39,14 @@ public class AggregateExpressionContext : IExpressionContext
         _aggregate = aggregate;
         _functions = functions;
         _aggregateFunctions = aggregateFunctions;
+        _expressionCache = new Dictionary<Expression, BaseValueType>
+        {
+            { _aggregate.AggregateKey, _aggregate.AggregateValue }
+        };
     }
 
-    public BaseValueType Get(Identifier identifier) => _aggregate.GetAggregated(identifier);
+    public BaseValueType Get(Identifier identifier) =>
+        _aggregate.GetAggregated(new IdentifierReferenceExpression(identifier));
 
     public BaseValueType EvaluateFunction(Identifier identifier, IReadOnlyList<Expression> arguments)
     {
@@ -65,5 +73,11 @@ public class AggregateExpressionContext : IExpressionContext
         }
 
         throw new ApplicationException($"Cannot evaluate '{identifier.Name}': function not found.");
+    }
+
+    public BaseValueType? TryGetCached(Expression expression)
+    {
+        var result = _expressionCache.ContainsKey(expression) ? _expressionCache[expression] : null;
+        return result;
     }
 }

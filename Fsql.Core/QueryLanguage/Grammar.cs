@@ -1,4 +1,5 @@
 ﻿using CSharpParserGenerator;
+using Fsql.Core.DataStructures;
 
 namespace Fsql.Core.QueryLanguage
 {
@@ -142,7 +143,14 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[]{ Alphabet.Group, Alphabet.By, Alphabet.Identifier, new Op(o =>
                     {
-                        o[0] = new GroupByExpression(new List<Identifier>{ new(o[2]) });
+                        var expression = new IdentifierReferenceExpression(new(o[2]));
+                        o[0] = new GroupByExpression(new List<Expression>{ expression });
+                    }) },
+                    new Token[]{ Alphabet.Group, Alphabet.By, Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, new Op(o =>
+                    {
+                        var arguments = new[] { new IdentifierReferenceExpression(new(o[4])) };
+                        var expression = new FunctionCall(new(o[2]), new(arguments));
+                        o[0] = new GroupByExpression(new []{ expression });
                     }) },
                 },
                 [Alphabet.ORDER_BY_EXPRESSION] = new []
@@ -261,7 +269,8 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, new Op(o =>
                     {
-                        o[0] = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
+                        var items = new[] { new IdentifierReferenceExpression(new(o[2])) };
+                        o[0] = new FunctionCall(new Identifier(o[0]), new(items));
                     }) },
                 },
                 [Alphabet.SELECT_TERMS] = new []
@@ -278,7 +287,8 @@ namespace Fsql.Core.QueryLanguage
                     }) },
                     new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, new Op(o =>
                     {
-                        var term = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
+                        var items = new[] { new IdentifierReferenceExpression(new(o[2])) };
+                        var term = new FunctionCall(new Identifier(o[0]), new(items));
                         o[0] = new List<Expression>{ term };
                     }) },
                     new Token[]{ Alphabet.Identifier, Alphabet.Separator, Alphabet.SELECT_TERMS, new Op(o =>
@@ -295,7 +305,8 @@ namespace Fsql.Core.QueryLanguage
                     }) },
                     new Token[]{ Alphabet.Identifier, Alphabet.LeftParenthesis, Alphabet.Identifier, Alphabet.RightParenthesis, Alphabet.Separator, Alphabet.SELECT_TERMS, new Op(o =>
                     {
-                        var term = new FunctionCall(new Identifier(o[0]), new List<Expression>{ new IdentifierReferenceExpression(new(o[2])) });
+                        var items = new[] { new IdentifierReferenceExpression(new(o[2])) };
+                        var term = new FunctionCall(new Identifier(o[0]), new(items));
                         o[0] = new List<Expression>{ term };
                         o[0].AddRange(o[5]);
                     }) },

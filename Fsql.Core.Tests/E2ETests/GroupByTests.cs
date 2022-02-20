@@ -56,6 +56,26 @@ public class GroupByTests : IClassFixture<ParserFixture>
         act.Should().Throw<AggregateAttributeException>();
     }
 
+    [Fact]
+    public void WhenGroupingByFunctionResultReturnExpectedResult()
+    {
+        var givenInput = "SELECT count(name), UPPER(extension) FROM /home GROUP BY upper(extension)";
+
+        var actualResult = Act(givenInput);
+
+        actualResult.Rows.Should().HaveCount(4);
+    }
+
+    [Fact]
+    public void WhenGroupingByFunctionResultAndSelectingAttributeThrowExpectedException()
+    {
+        var givenInput = "SELECT count(name), extension FROM /home GROUP BY upper(extension)";
+
+        var act = () => Act(givenInput);
+
+        act.Should().Throw<AggregateAttributeException>();
+    }
+
     private QueryEvaluationResult Act(string givenInput)
     {
         var evaluation = new QueryEvaluation(FileSystemAccess);

@@ -32,7 +32,7 @@ public class QueryEvaluation
         var allRows = ComputeFrom(query.FromExpression, queryContext);
         var filteredRows = ComputeWhere(allRows, query.WhereExpression);
 
-        var groupedContexts = ComputeGroupBy(filteredRows, query.GroupByExpression);
+        var groupedContexts = ComputeGroupBy(CreateContexts(filteredRows), query.GroupByExpression);
         var orderedContexts = ComputeOrderBy(groupedContexts, query.OrderByExpression);
         var selectResult = ComputeSelect(orderedContexts, expandedAttributes).ToList();
         return new(attributeNames, selectResult);
@@ -86,15 +86,16 @@ public class QueryEvaluation
         });
     }
 
-    private IEnumerable<IExpressionContext> ComputeGroupBy(IEnumerable<IRow> rows, GroupByExpression expression)
+    private IEnumerable<IExpressionContext> ComputeGroupBy(IEnumerable<SingleRowExpressionContext> rows, GroupByExpression expression)
     {
         if (expression == GroupByExpression.NoGrouping)
-            return CreateContexts(rows);
+            return rows;
 
-        var aggregateAttribute = expression.Attributes.Single();
+        var aggregateExpression = expression.Attributes.Single();
+
         var groups = rows
-            .GroupBy(row => row.Get(aggregateAttribute))
-            .Select(grouping => new RowAggregate(grouping.ToList(), aggregateAttribute));
+            .GroupBy(aggregateExpression.Evaluate)
+            .Select(grouping => new RowAggregate(grouping.ToList(), aggregateExpression, grouping.Key));
 
         return CreateContexts(groups);
     }
@@ -106,18 +107,21 @@ public class QueryEvaluation
 
         var condition = expression.Conditions.Single();
         return condition.Ascending
-            ? contexts.OrderBy(condition.Expression.Evaluate)
+            ? contexts.OrderBy(context => context.TryGetCached(condition.Expression) ?? condition.Expression.Evaluate(context))
             : contexts.OrderByDescending(condition.Expression.Evaluate);
     }
 
     private IEnumerable<BaseValueType[]> ComputeSelect(IEnumerable<IExpressionContext> contexts, IReadOnlyCollection<Expression> attributes)
     {
-        return contexts.Select(context => attributes
-            .Select(attribute => attribute.Evaluate(context))
-            .ToArray());
+        foreach (var context in contexts)
+        {
+            yield return attributes
+                .Select(attribute => context.TryGetCached(attribute) ?? attribute.Evaluate(context))
+                .ToArray();
+        }
     }
 
-    private IEnumerable<IExpressionContext> CreateContexts(IEnumerable<IRow> rows) =>
+    private IEnumerable<SingleRowExpressionContext> CreateContexts(IEnumerable<IRow> rows) =>
         rows.Select(row => new SingleRowExpressionContext(row, _functions));
 
     private IEnumerable<IExpressionContext> CreateContexts(IEnumerable<IRowAggregate> aggregates) =>

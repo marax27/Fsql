@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Fsql.Core.Evaluation;
-using Fsql.Core.Functions;
 
 namespace Fsql.Core.Tests.WhenEvaluatingExpressions;
 
@@ -20,4 +19,6 @@ internal class StubExpressionContext : IExpressionContext
     {
         throw new NotImplementedException();
     }
+
+    public BaseValueType? TryGetCached(Expression expression) => null;
 }

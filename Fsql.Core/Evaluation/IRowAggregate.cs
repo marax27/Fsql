@@ -7,31 +7,33 @@ public class AggregateAttributeException : ApplicationException
 
 public interface IRowAggregate
 {
-    BaseValueType GetAggregated(Identifier attribute);
+    BaseValueType GetAggregated(Expression attribute);
 
     IEnumerable<BaseValueType> GetMany(Identifier attribute);
 
-    Identifier AggregateKey { get; }
+    Expression AggregateKey { get; }
+    BaseValueType AggregateValue { get; }
 
     int RowsCount { get; }
 }
 
 public class RowAggregate : IRowAggregate
 {
-    private readonly IReadOnlyList<IRow> _rows;
+    private readonly IReadOnlyList<SingleRowExpressionContext> _rows;
 
-    public RowAggregate(IReadOnlyList<IRow> rows, Identifier aggregateKey)
+    public RowAggregate(IReadOnlyList<SingleRowExpressionContext> rows, Expression aggregateKey, BaseValueType aggregateValue)
     {
         _rows = rows;
         AggregateKey = aggregateKey;
+        AggregateValue = aggregateValue;
     }
 
-    public BaseValueType GetAggregated(Identifier attribute)
+    public BaseValueType GetAggregated(Expression attribute)
     {
         if (attribute != AggregateKey)
-            throw new AggregateAttributeException($"'{attribute.Name}' is not an aggregate attribute.");
+            throw new AggregateAttributeException($"'{attribute}' is not an aggregate attribute.");
 
-        return _rows[0].Get(attribute);
+        return AggregateValue;
     }
 
     public IEnumerable<BaseValueType> GetMany(Identifier attribute)
@@ -39,7 +41,8 @@ public class RowAggregate : IRowAggregate
         return _rows.Select(row => row.Get(attribute));
     }
 
-    public Identifier AggregateKey { get; }
+    public Expression AggregateKey { get; }
+    public BaseValueType AggregateValue { get; }
 
     public int RowsCount => _rows.Count;
 }

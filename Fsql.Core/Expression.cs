@@ -1,4 +1,5 @@
-﻿using Fsql.Core.Evaluation;
+﻿using Fsql.Core.DataStructures;
+using Fsql.Core.Evaluation;
 
 namespace Fsql.Core;
 
@@ -6,6 +7,8 @@ public interface IExpressionContext
 {
     BaseValueType Get(Identifier identifier);
     BaseValueType EvaluateFunction(Identifier identifier, IReadOnlyList<Expression> arguments);
+
+    BaseValueType? TryGetCached(Expression expression);
 }
 
 public abstract record Expression
@@ -28,7 +31,7 @@ public record NullConstant : Expression
     public override BaseValueType Evaluate(IExpressionContext context) => new NullValueType();
 }
 
-public record FunctionCall(Identifier Identifier, IReadOnlyList<Expression> Arguments) : Expression
+public record FunctionCall(Identifier Identifier, InRecordList<Expression> Arguments) : Expression
 {
     public override BaseValueType Evaluate(IExpressionContext context)
     {

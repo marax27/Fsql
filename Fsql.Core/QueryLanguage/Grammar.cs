@@ -1,5 +1,4 @@
 ﻿using CSharpParserGenerator;
-using Fsql.Core.DataStructures;
 
 namespace Fsql.Core.QueryLanguage
 {
@@ -41,7 +40,7 @@ namespace Fsql.Core.QueryLanguage
         QUERY, SELECT_TERMS, STRING,
         EXPRESSION, A1, A4, A6, A7,
         SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, GROUP_BY_EXPRESSION, ORDER_BY_EXPRESSION,
-        ORDER_CONDITION, FROM_PATH, FUNCTION_CALL, FUNCTION_ARGUMENTS,
+        ORDER_CONDITION, FROM_PATH, FUNCTION_CALL,
     }
 
     internal class Grammar

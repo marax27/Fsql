@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Fsql.Core.Evaluation;
-using Fsql.Core.FileSystem;
 using Fsql.Core.FileSystem.Abstractions;
 using Xunit;
 

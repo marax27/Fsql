@@ -1,6 +1,4 @@
-﻿using Fsql.Core.Evaluation;
-
-namespace Fsql.Core.Functions;
+﻿namespace Fsql.Core.Functions;
 
 public class ArgumentCountException : ApplicationException
 {

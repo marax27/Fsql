@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentAssertions;
 using Fsql.Cli.Models;
 using Xunit;
@@ -31,10 +30,7 @@ public class TableModelTests
     {
         var givenHeaders = Array.Empty<string>();
 
-        var act = () =>
-        {
-            var actualResult = new TableModel(givenHeaders, _sampleRows);
-        };
+        var act = () => new TableModel(givenHeaders, _sampleRows);
 
         act.Should().Throw<ArgumentException>()
             .Which.ParamName.Should().Be("headers");
@@ -45,10 +41,7 @@ public class TableModelTests
     {
         var givenRows = Array.Empty<string[]>();
 
-        var act = () =>
-        {
-            var actualResult = new TableModel(_sampleHeaders, givenRows);
-        };
+        var act = () => new TableModel(_sampleHeaders, givenRows);
 
         act.Should().NotThrow();
     }
@@ -66,10 +59,7 @@ public class TableModelTests
             new[] { "a", "b" },
         };
 
-        var act = () =>
-        {
-            var actualResult = new TableModel(givenHeaders, givenRows);
-        };
+        var act = () => new TableModel(givenHeaders, givenRows);
 
         act.Should().Throw<ArgumentException>();
     }

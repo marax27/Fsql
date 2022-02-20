@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Fsql.Core.Evaluation;
 using Xunit;
 
 namespace Fsql.Core.Tests.WhenParsing;

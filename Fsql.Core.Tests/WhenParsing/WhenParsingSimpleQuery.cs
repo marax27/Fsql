@@ -17,7 +17,7 @@ public class WhenParsingSimpleQuery : IClassFixture<ParserFixture>
     [Fact]
     public void GivenSimpleQueryThenParseSuccessfully()
     {
-        var result = _parserFixture.Sut.Parse($"SELECT * FROM 'sample-path'");
+        var result = _parserFixture.Sut.Parse("SELECT * FROM 'sample-path'");
         result.Should().NotBeNull();
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Fsql.Core.Evaluation;
 using Fsql.Core.FileSystem.Abstractions;
 using Fsql.Core.Tests.WhenEvaluating;
@@ -98,14 +97,16 @@ public class FunctionCallTests : IClassFixture<ParserFixture>
     public void WhenCallingFunctionInSelectExpressionReturnExpectedValues()
     {
         var givenInput = "SELECT name,human(size),upper(extension) FROM /home";
-        var query = _parserFixture.Sut.Parse(givenInput);
+        var act = () => _parserFixture.Sut.Parse(givenInput);
+        act.Should().NotThrow();
     }
 
     [Fact]
     public void WhenCallingFunctionWithMixedUppercaseLowercaseCharactersReturnExpectedValues()
     {
         var givenInput = "SELECT name,HUMAN(size),Upper(extension) FROM /home";
-        var query = _parserFixture.Sut.Parse(givenInput);
+        var act = () => _parserFixture.Sut.Parse(givenInput);
+        act.Should().NotThrow();
     }
 
     private IFileSystemAccess FileSystemAccess =>

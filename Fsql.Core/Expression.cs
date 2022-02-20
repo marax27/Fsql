@@ -113,7 +113,7 @@ public record AndExpression(Expression Left, Expression Right) : Expression
     private bool? CheckType(BaseValueType value) => value switch
     {
         BooleanValueType boolValue => boolValue.Value,
-        NullValueType _ => null,
+        NullValueType => null,
         _ => throw new CastException($"AND operator expects a boolean (or null) argument: {value} received.")
     };
 }
@@ -136,7 +136,7 @@ public record OrExpression(Expression Left, Expression Right) : Expression
     private bool? CheckType(BaseValueType value) => value switch
     {
         BooleanValueType boolValue => boolValue.Value,
-        NullValueType _ => null,
+        NullValueType => null,
         _ => throw new CastException($"OR operator expects a boolean (or null) argument: {value} received.")
     };
 }

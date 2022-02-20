@@ -15,8 +15,9 @@ namespace Fsql.Core.Tests.WhenEvaluating
         [InlineData("NAME")]
         public void Given1NamedAttributeReturnExpectedHeader(string givenAttribute)
         {
+            var expectedResult = new[] { givenAttribute };
             var result = Evaluate(new[] { givenAttribute });
-            result.AttributeNames.Should().BeEquivalentTo(new[] { givenAttribute });
+            result.AttributeNames.Should().BeEquivalentTo(expectedResult);
         }
 
         [Fact]

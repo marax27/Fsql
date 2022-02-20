@@ -17,7 +17,7 @@ public class WhenEvaluatingWithWhere
             new IdentifierReferenceExpression(nameId),
             new StringConstant("example.jpg")
         );
-        var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
+        var sut = new QueryEvaluation(fsAccess);
 
         var givenQuery = new Query(new[] { new IdentifierReferenceExpression(nameId) }, new("./path", false), whereExpression, GroupByExpression.NoGrouping, OrderByExpression.NoOrdering);
 

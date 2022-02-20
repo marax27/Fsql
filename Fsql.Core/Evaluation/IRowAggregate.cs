@@ -12,9 +12,8 @@ public interface IRowAggregate
     IEnumerable<BaseValueType> GetMany(Identifier attribute);
 
     Expression AggregateKey { get; }
-    BaseValueType AggregateValue { get; }
 
-    int RowsCount { get; }
+    BaseValueType AggregateValue { get; }
 }
 
 public class RowAggregate : IRowAggregate
@@ -42,7 +41,6 @@ public class RowAggregate : IRowAggregate
     }
 
     public Expression AggregateKey { get; }
-    public BaseValueType AggregateValue { get; }
 
-    public int RowsCount => _rows.Count;
+    public BaseValueType AggregateValue { get; }
 }

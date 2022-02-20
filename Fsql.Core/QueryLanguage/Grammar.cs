@@ -9,6 +9,7 @@ namespace Fsql.Core.QueryLanguage
         Select,
         From,
         Where,
+        Group,
         Order,
         By,
         And,
@@ -38,7 +39,7 @@ namespace Fsql.Core.QueryLanguage
         // Non-terminal symbols.
         QUERY, SELECT_TERMS, STRING,
         EXPRESSION, A1, A4, A6, A7,
-        SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, ORDER_BY_EXPRESSION,
+        SELECT_EXPRESSION, FROM_EXPRESSION, WHERE_EXPRESSION, GROUP_BY_EXPRESSION, ORDER_BY_EXPRESSION,
         ORDER_CONDITION, FROM_PATH, FUNCTION_CALL, FUNCTION_ARGUMENTS,
     }
 
@@ -51,6 +52,7 @@ namespace Fsql.Core.QueryLanguage
                 [Alphabet.Select] = "[sS][eE][lL][eE][cC][tT]",
                 [Alphabet.From] = "[fF][rR][oO][mM]",
                 [Alphabet.Where] = "[wW][hH][eE][rR][eE]",
+                [Alphabet.Group] = "[gG][rR][oO][uU][pP]",
                 [Alphabet.Order] = "[oO][rR][dD][eE][rR]",
                 [Alphabet.By] = "[bB][yY]",
                 [Alphabet.And] = "[aA][nN][dD]",
@@ -84,19 +86,35 @@ namespace Fsql.Core.QueryLanguage
                 {
                     new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, new Op(o =>
                     {
-                        o[0] = new Query(o[0], o[1], null, OrderByExpression.NoOrdering);
+                        o[0] = new Query(o[0], o[1], null, GroupByExpression.NoGrouping, OrderByExpression.NoOrdering);
                     }) },
                     new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.WHERE_EXPRESSION, new Op(o =>
                     {
-                        o[0] = new Query(o[0], o[1], o[2], OrderByExpression.NoOrdering);
+                        o[0] = new Query(o[0], o[1], o[2], GroupByExpression.NoGrouping, OrderByExpression.NoOrdering);
                     }) },
                     new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.ORDER_BY_EXPRESSION, new Op(o =>
                     {
-                        o[0] = new Query(o[0], o[1], null, o[2]);
+                        o[0] = new Query(o[0], o[1], null, GroupByExpression.NoGrouping, o[2]);
                     }) },
                     new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.WHERE_EXPRESSION, Alphabet.ORDER_BY_EXPRESSION, new Op(o =>
                     {
-                        o[0] = new Query(o[0], o[1], o[2], o[3]);
+                        o[0] = new Query(o[0], o[1], o[2], GroupByExpression.NoGrouping, o[3]);
+                    }) },
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.GROUP_BY_EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new Query(o[0], o[1], null, o[2], OrderByExpression.NoOrdering);
+                    }) },
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.WHERE_EXPRESSION, Alphabet.GROUP_BY_EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new Query(o[0], o[1], o[2], o[3], OrderByExpression.NoOrdering);
+                    }) },
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.GROUP_BY_EXPRESSION, Alphabet.ORDER_BY_EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new Query(o[0], o[1], null, o[2], o[3]);
+                    }) },
+                    new Token[]{ Alphabet.SELECT_EXPRESSION, Alphabet.FROM_EXPRESSION, Alphabet.WHERE_EXPRESSION, Alphabet.GROUP_BY_EXPRESSION, Alphabet.ORDER_BY_EXPRESSION, new Op(o =>
+                    {
+                        o[0] = new Query(o[0], o[1], o[2], o[3], o[4]);
                     }) },
                 },
                 [Alphabet.SELECT_EXPRESSION] = new []
@@ -118,6 +136,13 @@ namespace Fsql.Core.QueryLanguage
                     new Token[]{ Alphabet.Where, Alphabet.EXPRESSION, new Op(o =>
                     {
                         o[0] = o[1];
+                    }) },
+                },
+                [Alphabet.GROUP_BY_EXPRESSION] = new []
+                {
+                    new Token[]{ Alphabet.Group, Alphabet.By, Alphabet.Identifier, new Op(o =>
+                    {
+                        o[0] = new GroupByExpression(new List<Identifier>{ new(o[2]) });
                     }) },
                 },
                 [Alphabet.ORDER_BY_EXPRESSION] = new []

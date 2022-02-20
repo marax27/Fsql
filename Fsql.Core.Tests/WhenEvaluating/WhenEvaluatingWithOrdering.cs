@@ -13,7 +13,10 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameAscendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "ADirectory", "BDirectory", "ZDirectory", "aaa", "azz" };
-        var givenQuery = new Query(new[] { new IdentifierReferenceExpression(new("name")) }, new("./path", false), null,
+        var givenQuery = new Query(new[] { new IdentifierReferenceExpression(new("name")) },
+            new("./path", false),
+            null,
+            GroupByExpression.NoGrouping,
             new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("name")), true) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
@@ -28,7 +31,7 @@ public class WhenEvaluatingWithOrdering
     public void GivenOrderedByNameDescendingReturnInCorrectOrder()
     {
         var expectedNames = new[] { "azz", "aaa", "ZDirectory", "BDirectory", "ADirectory" };
-        var givenQuery = new Query(new[] { new IdentifierReferenceExpression(new("name")) }, new("./path", false), null, new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("name")), false) }));
+        var givenQuery = new Query(new[] { new IdentifierReferenceExpression(new("name")) }, new("./path", false), null, GroupByExpression.NoGrouping, new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("name")), false) }));
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
 
         var result = sut.Evaluate(givenQuery);
@@ -46,6 +49,7 @@ public class WhenEvaluatingWithOrdering
             new[] { new IdentifierReferenceExpression(new("name")), new IdentifierReferenceExpression(new("size")) },
             new("./path", false),
             null,
+            GroupByExpression.NoGrouping,
             new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("size")), true) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));
@@ -65,6 +69,7 @@ public class WhenEvaluatingWithOrdering
             new[] { new IdentifierReferenceExpression(new("name")), new IdentifierReferenceExpression(new("size")) },
             new("./path", false),
             null,
+            GroupByExpression.NoGrouping,
             new(new[] { new OrderCondition(new IdentifierReferenceExpression(new("size")), false) })
         );
         var sut = new QueryEvaluation(new StubFileSystemAccess(GivenEntries));

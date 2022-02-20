@@ -11,7 +11,7 @@ public class WhenEvaluatingWildcard
     {
         var fsAccess = new FakeFileSystemAccess()
             .WithFiles("./path", 1024, "document.txt", "code.cs");
-        var query = new Query(new []{ new IdentifierReferenceExpression(new("*")) }, new("./path", false), null, OrderByExpression.NoOrdering);
+        var query = new Query(new []{ new IdentifierReferenceExpression(new("*")) }, new("./path", false), null, GroupByExpression.NoGrouping, OrderByExpression.NoOrdering);
         var sut = new QueryEvaluation(fsAccess);
 
         var result = sut.Evaluate(query);

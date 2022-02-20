@@ -4,14 +4,25 @@ public record Query(
     IReadOnlyCollection<Expression> SelectedAttributes,
     FromExpression FromExpression,
     Expression? WhereExpression,
+    GroupByExpression GroupByExpression,
     OrderByExpression OrderByExpression
 );
 
 public sealed record FromExpression(string Path, bool Recursive);
 
+public sealed record GroupByExpression(IReadOnlyCollection<Identifier> Attributes)
+{
+    public static GroupByExpression NoGrouping => new(Array.Empty<Identifier>());
+
+    public bool Equals(GroupByExpression? other) =>
+        other is { } && Attributes.SequenceEqual(other.Attributes);
+
+    public override int GetHashCode() => Attributes.GetHashCode();
+}
+
 public sealed record OrderByExpression(IReadOnlyCollection<OrderCondition> Conditions)
 {
-    public static OrderByExpression NoOrdering => new (Array.Empty<OrderCondition>());
+    public static OrderByExpression NoOrdering => new(Array.Empty<OrderCondition>());
 
     public bool Equals(OrderByExpression? other) =>
         other is { } && Conditions.SequenceEqual(other.Conditions);

@@ -16,5 +16,8 @@ internal class StubExpressionContext : IExpressionContext
 
     public BaseValueType Get(Identifier identifier) => Values[identifier];
 
-    public IFunction GetFunction(Identifier identifier) => throw new NotImplementedException();
+    public BaseValueType EvaluateFunction(Identifier identifier, IReadOnlyList<Expression> arguments)
+    {
+        throw new NotImplementedException();
+    }
 }

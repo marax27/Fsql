@@ -11,24 +11,30 @@ public class QueryEvaluation
 {
     private readonly IFileSystemAccess _fileSystemAccess;
     private readonly IReadOnlyDictionary<Identifier, IFunction> _functions;
+    private readonly IReadOnlyDictionary<Identifier, IAggregateFunction> _aggregateFunctions;
 
     public QueryEvaluation(IFileSystemAccess fileSystemAccess)
     {
         _fileSystemAccess = fileSystemAccess ?? throw new ArgumentNullException(nameof(fileSystemAccess));
         _functions = new StringFunctionsModule().Load();
+        _aggregateFunctions = new Dictionary<Identifier, IAggregateFunction>
+        {
+            { new("count"), new CountAggregateFunction() }
+        };
     }
 
     public QueryEvaluationResult Evaluate(Query query)
     {
         var queryContext = new FileSystemQueryContext();
         var expandedAttributes = ExpandAttributes(query.SelectedAttributes, queryContext.Attributes).ToList();
+        var attributeNames = GetAttributeNames(expandedAttributes);
 
         var allRows = ComputeFrom(query.FromExpression, queryContext);
         var filteredRows = ComputeWhere(allRows, query.WhereExpression);
-        var orderedRows = ComputeOrderBy(filteredRows, query.OrderByExpression);
-        var selectResult = ComputeSelect(orderedRows, expandedAttributes).ToList();
 
-        var attributeNames = GetAttributeNames(expandedAttributes);
+        var groupedContexts = ComputeGroupBy(filteredRows, query.GroupByExpression);
+        var orderedContexts = ComputeOrderBy(groupedContexts, query.OrderByExpression);
+        var selectResult = ComputeSelect(orderedContexts, expandedAttributes).ToList();
         return new(attributeNames, selectResult);
     }
 
@@ -74,39 +80,48 @@ public class QueryEvaluation
 
         return rows.Where(row =>
         {
-            var context = new ExpressionContext(row, _functions);
+            var context = new SingleRowExpressionContext(row, _functions);
             var result = whereExpression.Evaluate(context);
             return result.EvaluatesToTrue();
         });
     }
 
-    private IEnumerable<IRow> ComputeOrderBy(IEnumerable<IRow> rows, OrderByExpression expression)
+    private IEnumerable<IExpressionContext> ComputeGroupBy(IEnumerable<IRow> rows, GroupByExpression expression)
+    {
+        if (expression == GroupByExpression.NoGrouping)
+            return CreateContexts(rows);
+
+        var aggregateAttribute = expression.Attributes.Single();
+        var groups = rows
+            .GroupBy(row => row.Get(aggregateAttribute))
+            .Select(grouping => new RowAggregate(grouping.ToList(), aggregateAttribute));
+
+        return CreateContexts(groups);
+    }
+
+    private IEnumerable<IExpressionContext> ComputeOrderBy(IEnumerable<IExpressionContext> contexts, OrderByExpression expression)
     {
         if (expression == OrderByExpression.NoOrdering)
-            return rows;
-
-        BaseValueType Predicate(IRow row, OrderCondition condition)
-        {
-            var context = new ExpressionContext(row, _functions);
-            return condition.Expression.Evaluate(context);
-        }
+            return contexts;
 
         var condition = expression.Conditions.Single();
         return condition.Ascending
-            ? rows.OrderBy(row => Predicate(row, condition))
-            : rows.OrderByDescending(row => Predicate(row, condition));
+            ? contexts.OrderBy(condition.Expression.Evaluate)
+            : contexts.OrderByDescending(condition.Expression.Evaluate);
     }
 
-    private IEnumerable<BaseValueType[]> ComputeSelect(IEnumerable<IRow> rows, IReadOnlyCollection<Expression> attributes)
+    private IEnumerable<BaseValueType[]> ComputeSelect(IEnumerable<IExpressionContext> contexts, IReadOnlyCollection<Expression> attributes)
     {
-        return rows.Select(row =>
-        {
-            var context = new ExpressionContext(row, _functions);
-            return attributes
-                .Select(attribute => attribute.Evaluate(context))
-                .ToArray();
-        });
+        return contexts.Select(context => attributes
+            .Select(attribute => attribute.Evaluate(context))
+            .ToArray());
     }
+
+    private IEnumerable<IExpressionContext> CreateContexts(IEnumerable<IRow> rows) =>
+        rows.Select(row => new SingleRowExpressionContext(row, _functions));
+
+    private IEnumerable<IExpressionContext> CreateContexts(IEnumerable<IRowAggregate> aggregates) =>
+        aggregates.Select(aggregate => new AggregateExpressionContext(aggregate, _functions, _aggregateFunctions));
 
     private IReadOnlyCollection<Expression> ExpandAttributes(
         IEnumerable<Expression> attributes, IReadOnlyCollection<Identifier> wildcardAttributes)

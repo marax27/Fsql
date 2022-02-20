@@ -41,7 +41,7 @@ public class TableModelTests
     }
 
     [Fact]
-    public void GivenEmptyRowsThrowExpectedException()
+    public void GivenEmptyRowsDoNotThrow()
     {
         var givenRows = Array.Empty<string[]>();
 
@@ -50,8 +50,7 @@ public class TableModelTests
             var actualResult = new TableModel(_sampleHeaders, givenRows);
         };
 
-        act.Should().Throw<ArgumentException>()
-            .Which.ParamName.Should().Be("rows");
+        act.Should().NotThrow();
     }
 
     [Fact]

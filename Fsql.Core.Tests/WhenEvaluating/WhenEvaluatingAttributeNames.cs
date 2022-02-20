@@ -75,7 +75,7 @@ namespace Fsql.Core.Tests.WhenEvaluating
                 .Select(id => new IdentifierReferenceExpression(id))
                 .ToList();
             var fsAccess = CreateFileSystemAccess();
-            var query = new Query(attributes, new("sample-path", false), null, OrderByExpression.NoOrdering);
+            var query = new Query(attributes, new("sample-path", false), null, GroupByExpression.NoGrouping, OrderByExpression.NoOrdering);
             var sut = new QueryEvaluation(fsAccess);
 
             return sut.Evaluate(query);

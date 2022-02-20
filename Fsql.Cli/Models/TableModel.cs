@@ -9,8 +9,6 @@ public class TableModel
     {
         if (headers.Count == 0)
             throw new ArgumentException("No headers provided.", nameof(headers));
-        if (rows.Count == 0)
-            throw new ArgumentException("No rows provided.", nameof(rows));
         if (rows.Any(row => row.Length != headers.Count))
             throw new ArgumentException("Not all rows have the same length as the header.");
 
